@@ -1,0 +1,40 @@
+#
+#  ____  ____ _____         _
+# |  _ \/ ___|_   _|_ _ ___| | __
+# | |_) \___ \ | |/ _` / __| |/ /
+# |  _ < ___) || | (_| \__ \   <
+# |_| \_\____/ |_|\__,_|___/_|\_\
+#
+# @author 若水
+name: RSTask
+api: ["1.0.8"]
+version: "1.0.8"
+main: com.Task.RSTask
+author: "若水"
+load: POSTWORLD
+commands:
+ c:
+  description: §6任务系统
+  usage: /c
+ sh:
+  description: §d保存手上的物品到ItemTag
+  usage: /sh
+  permission: RSTask.command.sh
+ ic:
+  description: §c创建任务
+  usage: /ic
+  permission: RSTask.command.ic
+ del-task:
+  description: §e删除任务
+  permission: RSTask.command.del-task
+
+permissions:
+ RSTask.command.sh:
+  description: §d保存手上的物品到ItemTag
+  default: op
+ RSTask.command.ic:
+  description: §c创建任务
+  default: op
+ RSTask.command.del-task:
+  description: §e删除任务
+  default: op
