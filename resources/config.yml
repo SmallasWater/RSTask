@@ -43,7 +43,7 @@ enable-EconomyAPi: true
 #显示任务进度的底部类型 分为popup,tip,action
 底部显示类型: "tip"
 
-是否使用计分板: false
+是否使用计分板: true
 
 计分板:
  标题: "任务系统"
