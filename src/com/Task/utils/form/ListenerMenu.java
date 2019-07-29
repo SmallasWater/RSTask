@@ -69,11 +69,25 @@ public class ListenerMenu implements Listener{
                         Server.getInstance().getLogger().warning("无法获取玩家"+player.getName()+"点击的任务");
                     }
                 }else if(Integer.parseInt(data) == 1){
+                    createMenu.sendAgain(player);
+                }else{
+                    createMenu.sendTaskList(player,RSTask.getClickStar.get(player));
+                }
+                break;
+            case createMenu.again:
+                if(data.equals("null")){
+                    if(RSTask.getClickTask.containsKey(player)){
+                        createMenu.sendTaskMenu(player,RSTask.getClickTask.get(player));
+                    }
+                    return;
+                }
+                if(data.equals("true")){
                     TaskFile file1 = RSTask.getClickTask.get(player);
                     playerGiveUpTaskEvent event1 = new playerGiveUpTaskEvent(file1,player);
                     Server.getInstance().getPluginManager().callEvent(event1);
+                    return;
                 }else{
-                    createMenu.sendTaskList(player,RSTask.getClickStar.get(player));
+                    createMenu.sendTaskMenu(player,RSTask.getClickTask.get(player));
                 }
                 break;
             case createMenu.Create:

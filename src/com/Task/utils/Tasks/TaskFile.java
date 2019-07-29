@@ -4,7 +4,7 @@ package com.Task.utils.Tasks;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.command.ConsoleCommandSender;
+
 import cn.nukkit.utils.Config;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
@@ -14,10 +14,8 @@ import com.Task.utils.events.playerAddTaskEvent;
 import javafx.concurrent.Task;
 
 import java.io.File;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  *   ____  ____ _____         _
@@ -148,7 +146,7 @@ public class TaskFile {
         return successItem;
     }
 
-    public com.Task.utils.Tasks.TaskItems.successItem getFristSuccessItem() {
+    public successItem getFristSuccessItem() {
         return fristSuccessItem;
     }
 
@@ -382,6 +380,7 @@ public class TaskFile {
         LinkedList<TaskFile> names_ = new LinkedList<>();
         File[] files = file.listFiles();
         if(files != null){
+            Arrays.sort(files);
             for(File file1:files){
                 if(file1.isFile()){
                     String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
@@ -404,7 +403,7 @@ public class TaskFile {
         return files;
     }
 
-    public static void runTaskFile(Player player,TaskFile file){
+    public static boolean runTaskFile(Player player,TaskFile file){
 
         playerFile file1 = playerFile.getPlayerFile(player.getName());
         if(file1.can_Invite(file.getTaskName())){
@@ -414,22 +413,23 @@ public class TaskFile {
             if(file1.issetTask(file)){
                 if(file1.isSuccessed(file.getTaskName()) && file.getSuccessItem().getCount() == 0){
                     player.sendMessage(RSTask.getTask().getLag("repeat-collection"));
-                    return;
+                    return false;
                 }else if(!file1.inDay(file.getTaskName())){
                     int day = file.getDay();
                     int out = DataTool.getTime(file1.getTaskByName(file.getTaskName()).getTaskClass().getTime());
                     player.sendMessage(RSTask.getTask().getLag("repeat-inDay").
                             replace("%c",((day > out)?(day - out):0)+""));
-                    return;
+                    return false;
                 }
             }else{
                 player.sendMessage(RSTask.getTask().getLag("useLastTask").replace("%s",file.getLastTask()));
-                return;
+                return false;
             }
         }
         if(file.getType() == TaskFile.TaskType.CollectItem){
             CollectItemTask.onRun(player);
         }
+        return true;
     }
 
 

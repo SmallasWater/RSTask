@@ -13,8 +13,11 @@ import cn.nukkit.event.entity.EntityInventoryChangeEvent;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
+import com.Task.utils.ItemIDSunName;
 import com.Task.utils.Scorebroad.ScoreTask;
 import com.Task.utils.Tasks.TaskFile;
 import com.Task.utils.Tasks.TaskItems.ItemClass;
@@ -24,9 +27,11 @@ import com.Task.utils.Tasks.playerFile;
 import com.Task.utils.events.*;
 import com.Task.utils.form.createMenu;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 public class ListerEvents implements Listener{
+    private LinkedList<Player> giveUp = new LinkedList<>();
 
     @EventHandler
     public void onBreak(BlockBreakEvent event){
@@ -74,6 +79,7 @@ public class ListerEvents implements Listener{
         Player player = event.getPlayer();
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.Click);
+
     }
 
 
@@ -92,6 +98,8 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void use(useTaskEvent event){
         Player player = event.getPlayer();
+        Level level = player.getLevel();
+        level.addSound(player.getPosition(),Sound.TILE_PISTON_OUT);
         playerTask task = event.getTaskItem();
         playerFile file = new playerFile(player.getName());
         playerTask newTask = file.getTaskByName(task.getTaskName());
@@ -111,6 +119,7 @@ public class ListerEvents implements Listener{
 
         }
     }
+
     @EventHandler
     public void onGiveUp(playerGiveUpTaskEvent event){
         Player player = event.getPlayer();
@@ -120,6 +129,7 @@ public class ListerEvents implements Listener{
             Server.getInstance().getLogger().warning("玩家"+player.getName()+"取消"+file.getTaskName()+"任务异常");
             return;
         }
+        giveUp.remove(player);
         player.sendMessage(RSTask.getTask().getLag("giveUpTaskMessage","§d§l[任务系统]§b 您放弃了 %s 任务")
                 .replace("%s",file.getTaskName()));
         RSTask.getClickTask.remove(player);
@@ -131,11 +141,11 @@ public class ListerEvents implements Listener{
         Player player = event.getPlayer();
         TaskFile file = event.getFile();
         if(file != null){
-            TaskFile.runTaskFile(player,file);
+            if(TaskFile.runTaskFile(player,file)){
+                RSTask.getClickTask.put(player,file);
+                createMenu.sendTaskMenu(player,file);
+            }
         }
-        RSTask.getClickTask.put(player,file);
-
-        createMenu.sendTaskMenu(player,file);
     }
 
     @EventHandler
@@ -153,6 +163,8 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onSuccess(successTaskEvent event){
         Player player = event.getPlayer();
+        Level level = player.getLevel();
+        level.addSound(player.getPosition(), Sound.RANDOM_LEVELUP);
         if(RSTask.taskNames.contains(event.getTaskName())){
             RSTask.taskNames.remove(event.getTaskName());
         }
@@ -167,6 +179,7 @@ public class ListerEvents implements Listener{
                 player.sendMessage(send);
             }
         }
+
     }
 
 
@@ -201,7 +214,7 @@ public class ListerEvents implements Listener{
 
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInventoryChange(EntityInventoryChangeEvent event){
         Entity player = event.getEntity();
         if(player instanceof Player){
@@ -240,10 +253,13 @@ public class ListerEvents implements Listener{
                         }
                     }
                 }
-                if(task.getTaskFile().getType() == TaskFile.TaskType.GetItem){
-                    Item item = event.getNewItem();
-                    addItem((Player) player,item, TaskFile.TaskType.GetItem);
+                if(!event.isCancelled()){
+                    if(task.getTaskFile().getType() == TaskFile.TaskType.GetItem){
+                        Item item = event.getNewItem();
+                        addItem((Player) player,item, TaskFile.TaskType.GetItem);
+                    }
                 }
+
             }
         }
     }
@@ -265,6 +281,9 @@ public class ListerEvents implements Listener{
         playerFile file = new playerFile(player);
         LinkedList<playerTask> getTasks = file.getInviteTasks();
         for(playerTask task:getTasks){
+            if(!task.getTaskClass().issetTaskItem(item)){
+                continue;
+            }
             if(task.getTaskClass().getOpen()){
                 if(task.getTaskFile().getType() == type){
                     if(canAdd){
@@ -297,10 +316,11 @@ public class ListerEvents implements Listener{
     private void addItem(Player player,Item item,TaskFile.TaskType type){
         if(item != null){
             ItemClass itemClass = new ItemClass(item);
-            if(RSTask.getTask().canExisteItemClass(itemClass)){
-                defaultUseTask(player.getName(),itemClass.toSaveConfig(), type,false);
+            if(!RSTask.getTask().canExisteItemClass(itemClass)){
+                defaultUseTask(player.getName(),itemClass.toTaskItem(false), type,false);
             }else{
-                defaultUseTask(player.getName(),itemClass.toSaveConfig(true),type,false);
+                defaultUseTask(player.getName(),itemClass.toTaskItem(true),type,false);
+
             }
         }
     }

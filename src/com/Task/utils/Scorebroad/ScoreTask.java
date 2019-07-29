@@ -40,7 +40,7 @@ public class ScoreTask{
                 fakeScoreboard.objective = ScoreMessage.getMessage(player);
                 fakeScoreboard.update();
             }
-        },20);
+        },30);
     }
 }
 class ScoreMessage{
@@ -49,7 +49,7 @@ class ScoreMessage{
 
     static DisplayObjective getMessage(Player player){
         Objective objective = new Objective("task",new ObjectiveCriteria("dummy",true));
-        DisplayObjective displayObjective = new DisplayObjective(objective,ObjectiveSortOrder.DESCENDING,ObjectiveDisplaySlot.SIDEBAR);
+        DisplayObjective displayObjective = new DisplayObjective(objective,ObjectiveSortOrder.ASCENDING,ObjectiveDisplaySlot.SIDEBAR);
         objective.setDisplayName(color[a]+RSTask.getTask().getScoreTitle());
         a++;
         if(a >= color.length){
@@ -83,16 +83,32 @@ class ScoreMessage{
 
             }
         }
-        int line = builder1.size() + 7;
-        int l = 1;
-        objective.setScore(l+1,"§d†§b任务: §r"+(file!=null?file.getTaskName():" §c请先领取任务"), line-1);
-        objective.setScore(l+2,"§d†§b介绍: §r"+(file!=null?file.getTaskMessage():"     §e暂无"), line-2);
-        objective.setScore(l+3,"§d†§b进度: §r"+(file!=null?"   §e↓↓↓↓":"     §e暂无"), line-3);
-        int i = 4;
+        int line = 1;
+        objective.setScore(line,"§d†§b任务: §r"+(file!=null?file.getTaskName():" §c请先领取任务"), line);
+        line++;
+        int a = 0;
+        if(file!=null){
+            for(String s:file.getTaskMessage().split("\\n")){
+                if(a == 0){
+                    objective.setScore(line,"§d†§b介绍:  §r"+s.trim(), line);
+                    a++;
+                    line++;
+                    continue;
+                }
+                objective.setScore(line,"§d†§r      "+s.trim(), line);
+                line++;
+            }
+        }else{
+            objective.setScore(line,"§d†§b介绍： §r     §e暂无", line);
+            line++;
+        }
+
+        objective.setScore(line,"§d†§b进度： §r"+(file!=null?"   §e↓↓↓↓":"     §e暂无"), line);
+        line++;
         if(builder1.size() > 0){
             for(String s:builder1){
-                objective.setScore(l+i,"§d†§r      "+s, line-i);
-                i++;
+                objective.setScore(line,"§d†§r      "+s, line);
+                line++;
             }
         }
         return displayObjective;

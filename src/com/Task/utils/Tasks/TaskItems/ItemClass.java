@@ -77,7 +77,7 @@ public class ItemClass {
     }
 
     /**
-     * 格式: id:damage:count:tag
+     * 格式: id:damage:count:tag && 编号@tag
      * */
 
     public static ItemClass toItem(String defaultString){
@@ -94,6 +94,17 @@ public class ItemClass {
                                 Integer.parseInt(items[1]), Integer.parseInt(items[2]));
                     } catch (Exception e) {
                         return null;
+                    }
+                }else if(defaultString.split("@")[1].equals("tag")){
+                    String ts = defaultString.split("@")[0];
+                    if(ts.split(":").length > 1){
+                        if(RSTask.getTask().canExistsNumber(ts.split(":")[0])){
+                            ItemClass itemClass = RSTask.getTask().getTagItemsConfig(ts.split(":")[0]);
+                            itemClass.getItem().setCount(Integer.parseInt(ts.split(":")[1]));
+                            return itemClass;
+                        }
+                    }else{
+                        return RSTask.getTask().getTagItemsConfig(ts);
                     }
                 }
             }
@@ -141,18 +152,28 @@ public class ItemClass {
                 +((item.hasCompoundTag())?bytesToHexString(item.getCompoundTag()):"not");
     }
 
+    public String toTaskItem(boolean defaultType){
+        if(item.hasCompoundTag() && defaultType){
+            String i = RSTask.getTask().saveTagItemsConfig(this);
+            return i+"@tag";
+        }
+        return item.getId()+":"+item.getDamage()+"@item";
+    }
+
     public String toSaveConfig(){
-        return toSaveConfig(false);
+        return toSaveConfig(item.hasCompoundTag());
 
     }
 
+
     public String toSaveConfig(boolean defaultType){
-        if(item.hasCompoundTag() || defaultType){
+        if(item.hasCompoundTag() && defaultType){
             String i = RSTask.getTask().saveTagItemsConfig(this);
             return i+"@tag";
         }
         return item.getId()+":"+item.getDamage()+":"+item.getCount()+"@item";
     }
+
 
 
     public boolean equals(ItemClass itemClass){

@@ -4,7 +4,6 @@ package com.Task.utils.Tasks;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.ConsoleCommandSender;
-import cn.nukkit.item.Item;
 import cn.nukkit.utils.Config;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
@@ -131,6 +130,7 @@ public class playerFile {
             toSaveConfig(defaultConfig());
         }
     }
+
 
 
 
@@ -269,7 +269,7 @@ public class playerFile {
                    return false;
                 }
                 if (file.getSuccessItem().getCount() == 0
-                        && getTaskByName(taskName).getTaskClass().getCount() > 1) {
+                        && isSuccessed(taskName)) {
                     return false;
                 }
                 if(isRunning(taskName))
@@ -449,15 +449,17 @@ public class playerFile {
         init();
         if(issetTask(taskName.getTaskName())){
             PlayerTaskClass use = getTaskByName(taskName.getTaskName()).getTaskClass();
-            int i = 0;
-            for(TaskItem item:use.getValue()){
-                if(item != null)
-                    if(TaskItemSuccess(item,taskName)){
-                        i++;
-                    }
-            }
-            if(i == use.getValue().length){
-                return true;
+            if(use.getOpen()){
+                int i = 0;
+                for(TaskItem item:use.getValue()){
+                    if(item != null)
+                        if(TaskItemSuccess(item,taskName)){
+                            i++;
+                        }
+                }
+                if(i == use.getValue().length){
+                    return true;
+                }
             }
         }
         return false;

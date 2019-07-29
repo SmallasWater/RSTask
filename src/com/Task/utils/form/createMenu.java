@@ -5,6 +5,7 @@ import cn.nukkit.Player;
 import cn.nukkit.form.element.*;
 import cn.nukkit.form.window.FormWindow;
 import cn.nukkit.form.window.FormWindowCustom;
+import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import com.Task.RSTask;
 import com.Task.utils.ItemIDSunName;
@@ -25,6 +26,8 @@ public class createMenu {
     public static final int Tasks = 0xcc1002;
     static final int Tasks_Menu = 0xcc1003;
     static final int Create = 0xcc1004;
+    static final int again = 0xcc1005;
+
     public static RSTask task = RSTask.getTask();
 
 
@@ -110,6 +113,21 @@ public class createMenu {
             }
         }
         send(player,simple,Tasks);
+    }
+
+    public static void sendAgain(Player player){
+        if(RSTask.getClickTask.containsKey(player)){
+            TaskFile file = RSTask.getClickTask.get(player);
+            if(file != null){
+                FormWindowModal simple = new FormWindowModal(task.getLag("title"),
+                        RSTask.getTask().getLag("giveUpChose","§d§l您确定要放弃了 %s 任务吗?\n§c放弃后会丢失当前进度")
+                                .replace("%s",file.getTaskName()),"确定","取消");
+
+                send(player,simple,again);
+            }
+        }else{
+            player.sendMessage("§c请再尝试一次");
+        }
     }
 
     public static void sendTaskMenu(Player player, TaskFile file){

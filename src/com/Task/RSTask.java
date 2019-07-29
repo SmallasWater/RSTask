@@ -101,11 +101,21 @@ public class RSTask extends PluginBase{
         return super.getConfig();
     }
 
+    /** 判断编号是否存在*/
+    public boolean canExistsNumber(String number){
+        Config config = new Config(this.getDataFolder()+"/TagItem.json",Config.JSON);
+        return (config.get(number) != null);
+    }
+
 
     /** 根据编号获取ItemClass */
     public ItemClass getTagItemsConfig(String number){
-        Config config = new Config(this.getDataFolder()+"/TagItem.json",Config.JSON);
-        return ItemClass.toItem(config.getString(number));
+        if(canExistsNumber(number)){
+            Config config = new Config(this.getDataFolder()+"/TagItem.json",Config.JSON);
+            return ItemClass.toItem(config.getString(number));
+        }
+        return null;
+
     }
 
 
@@ -115,7 +125,7 @@ public class RSTask extends PluginBase{
         LinkedHashMap<String,Object> map = (LinkedHashMap<String, Object>) config.getAll();
         for(String string:map.keySet()){
             String c = (String) map.get(string);
-            if(c.equals(itemClass.toString()))
+            if(ItemClass.toItem(c).equals(itemClass))
                 return true;
         }
         return false;
@@ -370,11 +380,13 @@ public class RSTask extends PluginBase{
             }
         }
         if(command.getName().equals("sh")){
-            if(args[0].equals("help")){
-                sender.sendMessage("§c=======================");
-                sender.sendMessage("§e/sh <编号(可不填)> <数量(可不填)>");
-                sender.sendMessage("§c=======================");
-                return true;
+            if(args.length > 0){
+                if(args[0].equals("help")){
+                    sender.sendMessage("§c=======================");
+                    sender.sendMessage("§e/sh <编号(可不填)> <数量(可不填)>");
+                    sender.sendMessage("§c=======================");
+                    return true;
+                }
             }
             if(sender instanceof Player){
                 Item item = ((Player) sender).getInventory().getItemInHand();

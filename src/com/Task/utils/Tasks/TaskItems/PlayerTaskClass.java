@@ -50,6 +50,8 @@ public class PlayerTaskClass {
         return t;
     }
 
+
+
     public String getTaskName() {
         return taskName;
     }
@@ -97,6 +99,16 @@ public class PlayerTaskClass {
 
     public void setValue(TaskItem[] value) {
         this.value = value;
+    }
+
+
+
+    public boolean issetTaskItem(String item){
+        for(TaskItem item1:value){
+            if(item1.getTask().equals(item))
+                return true;
+        }
+        return false;
     }
 
     public static PlayerTaskClass toPlayerTaskClass(String taskName, Map map){

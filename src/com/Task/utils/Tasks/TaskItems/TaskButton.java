@@ -36,6 +36,7 @@ public class TaskButton {
 
     public TaskButton(String ButtonText,ButtonImageType ButtonType,String ButtonData){
        text = ButtonText;
+
        type = ButtonType;
        data = ButtonData;
     }
