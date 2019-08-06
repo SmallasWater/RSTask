@@ -2,6 +2,7 @@ package com.Task.utils;
 
 
 import cn.nukkit.Player;
+import cn.nukkit.Server;
 import cn.nukkit.entity.item.EntityFirework;
 import cn.nukkit.item.ItemFirework;
 import cn.nukkit.level.Level;
@@ -61,6 +62,7 @@ public class DataTool {
 
     /** 放烟花*/
     public static void spawnFirework(Player player) {
+
         Level level = player.getLevel();
         ItemFirework item = new ItemFirework();
         CompoundTag tag = new CompoundTag();

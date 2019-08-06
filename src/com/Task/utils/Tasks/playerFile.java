@@ -545,85 +545,9 @@ public class playerFile {
     }
 
 
-
-
     /** 玩家完成任务 */
     public static void givePlayerSuccessItems(Player player, String taskName){
-
         if(TaskFile.isFileTask(taskName)){
-            TaskFile file = TaskFile.getTask(taskName);
-            int success = 0;
-            if(file != null && player.isOnline()){
-                com.Task.utils.Tasks.TaskItems.successItem item;
-                if(playerFile.getPlayerFile(player.getName()).isFrist(file)){
-                    item = file.getFristSuccessItem();
-                }else{
-                    item = file.getSuccessItem();
-                }
-
-                if(item.getItem() != null && item.getItem().length > 0){
-                    for(ItemClass itemClass:item.getItem()){
-                        if(itemClass != null){
-                            player.getInventory().addItem(itemClass.getItem().clone());
-                            player.sendMessage(RSTask.getTask().getLag("add-item-message")
-                                    .replace("%s", ItemIDSunName.getIDByName(itemClass.getItem())).replace("%c",itemClass.getItem().getCount()+""));
-                        }
-
-                    }
-                }
-                if(item.getCmd() != null && item.getCmd().length > 0){
-                    for(CommandClass commandClass:item.getCmd()){
-                        if(commandClass != null){
-                            Server.getInstance().getCommandMap().dispatch(new ConsoleCommandSender(),commandClass.getCmd().replace("@p",player.getName()));
-                            player.sendMessage(RSTask.getTask().getLag("add-Cmd-message").replace("%s",commandClass.getSendMessage()));
-                        }
-                    }
-                }
-                if(RSTask.loadEconomyAPI){
-                    if(item.getMoney() > 0){
-                        me.onebone.economyapi.EconomyAPI.getInstance().addMoney(player,item.getMoney());
-                        player.sendMessage(RSTask.getTask().getLag("add-money-message")
-                                .replace("%c",item.getMoney()+"").
-                                        replace("%m",RSTask.getTask().getCoinName()));
-                    }
-                }
-                if(RSTask.canOpen())
-                    if(item.getCount() > 0)
-                        success += item.getCount();
-            }
-
-            playerFile playerFile = new playerFile(player.getName());
-            playerTask task = playerFile.getTaskByName(taskName);
-            if(task == null){
-                playerFile.addTask(taskName);
-                task = playerFile.getTaskByName(taskName);
-            }
-            PlayerTaskClass playerTaskClass = task.getTaskClass();
-            TaskItem[] items = playerTaskClass.getValue();
-            for(TaskItem item:items){
-                item.setEndCount(0);
-            }
-            playerTaskClass.setOpen(false);
-            playerTaskClass.setValue(items);
-            playerTaskClass.setCount(playerTaskClass.getCount()+1);
-            playerTaskClass.setTime(new Date());
-            task.setTaskClass(playerTaskClass);
-            if(RSTask.canOpen()){
-                playerFile.setCount(playerFile.getCount() + success);
-            }
-            if(file != null){
-                if(file.getType() == TaskFile.TaskType.CollectItem){
-                    TaskItem[] items1 = file.getTaskItem();
-                    for(TaskItem item:items1){
-                        ItemClass itemClass = ItemClass.toItem(item);
-                        if(itemClass != null){
-                            itemClass.getItem().setCount(item.getEndCount());
-                            player.getInventory().removeItem(itemClass.getItem());
-                        }
-                    }
-                }
-            }
-            playerFile.setPlayerTask(task);
             successTaskEvent event = new successTaskEvent(player,taskName);
             Server.getInstance().getPluginManager().callEvent(event);
         }

@@ -4,6 +4,7 @@ package com.Task.utils.Task;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
+import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
@@ -20,13 +21,12 @@ import com.Task.utils.DataTool;
 import com.Task.utils.ItemIDSunName;
 import com.Task.utils.Scorebroad.ScoreTask;
 import com.Task.utils.Tasks.TaskFile;
-import com.Task.utils.Tasks.TaskItems.ItemClass;
-import com.Task.utils.Tasks.TaskItems.TaskItem;
-import com.Task.utils.Tasks.TaskItems.playerTask;
+import com.Task.utils.Tasks.TaskItems.*;
 import com.Task.utils.Tasks.playerFile;
 import com.Task.utils.events.*;
 import com.Task.utils.form.createMenu;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
@@ -36,6 +36,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onBreak(BlockBreakEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         Block block = event.getBlock();
         String s = block.getId()+":"+block.getDamage()+"@item";
         defaultUseTask(player.getName(),s, TaskFile.TaskType.BlockBreak,false);
@@ -45,6 +46,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onPlace(BlockPlaceEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         Block block = event.getBlock();
         String s = block.getId()+":"+block.getDamage()+"@item";
         defaultUseTask(player.getName(),s, TaskFile.TaskType.BlockPlayer,false);
@@ -54,6 +56,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onUseItem(PlayerItemConsumeEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.EatItem);
     }
@@ -61,6 +64,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onDropItem(PlayerDropItemEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.DropItem);
 
@@ -69,6 +73,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void Craft(CraftItemEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         Item item = event.getRecipe().getResult();
         addItem(player,item, TaskFile.TaskType.CraftItem);
     }
@@ -77,6 +82,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onInt(PlayerInteractEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.Click);
 
@@ -98,10 +104,10 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void use(useTaskEvent event){
         Player player = event.getPlayer();
-        Level level = player.getLevel();
-        level.addSound(player.getPosition(),Sound.TILE_PISTON_OUT);
         playerTask task = event.getTaskItem();
         playerFile file = new playerFile(player.getName());
+        Level level = player.getLevel();
+        level.addSound(player.getPosition(),Sound.TILE_PISTON_OUT);
         playerTask newTask = file.getTaskByName(task.getTaskName());
         if(!file.isSuccess(newTask.getTaskName())){
             String send = RSTask.getTask().getLag("run-task").
@@ -110,7 +116,7 @@ public class ListerEvents implements Listener{
             RSTask.sendMessage(player,send);
         }else{
             if(!RSTask.taskNames.contains(task.getTaskName())){
-
+                level.addSound(player.getPosition(),Sound.BLOCK_COMPOSTER_READY);
                 String send = RSTask.getTask().getLag("success-message")
                         .replace("%d",task.getTaskFile()
                                 .getStar()+"").replace("%s",task.getTaskName()).replace("\\n","\n");
@@ -139,6 +145,7 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onReceive(playerClickTaskEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         TaskFile file = event.getFile();
         if(file != null){
             if(TaskFile.runTaskFile(player,file)){
@@ -151,11 +158,91 @@ public class ListerEvents implements Listener{
     @EventHandler
     public void onAddTask(playerAddTaskEvent event){
         Player player = event.getPlayer();
+        if(player.getGamemode() == 1) return;
         TaskFile file = event.getFile();
         playerFile file1 = playerFile.getPlayerFile(player.getName());
         file1.addTask(file);
 
     }
+    @EventHandler
+    public void onSuccessTask(successTaskEvent event){
+        Player player = event.getPlayer();
+        String taskName = event.getTaskName();
+        TaskFile file = TaskFile.getTask(taskName);
+        int success = 0;
+        if(file != null && player.isOnline()){
+            com.Task.utils.Tasks.TaskItems.successItem item;
+            if(playerFile.getPlayerFile(player.getName()).isFrist(file)){
+                item = file.getFristSuccessItem();
+            }else{
+                item = file.getSuccessItem();
+            }
+
+            if(item.getItem() != null && item.getItem().length > 0){
+                for(ItemClass itemClass:item.getItem()){
+                    if(itemClass != null){
+                        player.getInventory().addItem(itemClass.getItem().clone());
+                        player.sendMessage(RSTask.getTask().getLag("add-item-message")
+                                .replace("%s", ItemIDSunName.getIDByName(itemClass.getItem())).replace("%c",itemClass.getItem().getCount()+""));
+                    }
+
+                }
+            }
+            if(item.getCmd() != null && item.getCmd().length > 0){
+                for(CommandClass commandClass:item.getCmd()){
+                    if(commandClass != null){
+                        Server.getInstance().getCommandMap().dispatch(new ConsoleCommandSender(),commandClass.getCmd().replace("@p",player.getName()));
+                        player.sendMessage(RSTask.getTask().getLag("add-Cmd-message").replace("%s",commandClass.getSendMessage()));
+                    }
+                }
+            }
+            if(RSTask.loadEconomyAPI){
+                if(item.getMoney() > 0){
+                    me.onebone.economyapi.EconomyAPI.getInstance().addMoney(player,item.getMoney());
+                    player.sendMessage(RSTask.getTask().getLag("add-money-message")
+                            .replace("%c",item.getMoney()+"").
+                                    replace("%m",RSTask.getTask().getCoinName()));
+                }
+            }
+            if(RSTask.canOpen())
+                if(item.getCount() > 0)
+                    success += item.getCount();
+        }
+
+        playerFile playerFile = new playerFile(player.getName());
+        playerTask task = playerFile.getTaskByName(taskName);
+        if(task == null){
+            playerFile.addTask(taskName);
+            task = playerFile.getTaskByName(taskName);
+        }
+        PlayerTaskClass playerTaskClass = task.getTaskClass();
+        TaskItem[] items = playerTaskClass.getValue();
+        for(TaskItem item:items){
+            item.setEndCount(0);
+        }
+        playerTaskClass.setOpen(false);
+        playerTaskClass.setValue(items);
+        playerTaskClass.setCount(playerTaskClass.getCount()+1);
+        playerTaskClass.setTime(new Date());
+        task.setTaskClass(playerTaskClass);
+        if(RSTask.canOpen()){
+            playerFile.setCount(playerFile.getCount() + success);
+        }
+        if(file != null){
+            if(file.getType() == TaskFile.TaskType.CollectItem){
+                TaskItem[] items1 = file.getTaskItem();
+                for(TaskItem item:items1){
+                    ItemClass itemClass = ItemClass.toItem(item);
+                    if(itemClass != null){
+                        itemClass.getItem().setCount(item.getEndCount());
+                        player.getInventory().removeItem(itemClass.getItem());
+                    }
+                }
+            }
+        }
+        playerFile.setPlayerTask(task);
+    }
+
 
 
 
@@ -218,6 +305,7 @@ public class ListerEvents implements Listener{
     public void onInventoryChange(EntityInventoryChangeEvent event){
         Entity player = event.getEntity();
         if(player instanceof Player){
+            if(((Player) player).getGamemode() == 1) return;
             playerFile file = new playerFile(player.getName());
             LinkedList<playerTask> getTasks = file.getInviteTasks();
             if(getTasks == null) return;

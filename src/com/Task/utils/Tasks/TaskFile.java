@@ -170,6 +170,7 @@ public class TaskFile {
             }
         }
         Config config = RSTask.getTask().getTaskConfig(TaskName);
+
         config.set("任务难度",star);
         config.set("任务介绍",TaskMessage == null ? "无":TaskMessage);
         config.set("刷新时间(天)",day);
