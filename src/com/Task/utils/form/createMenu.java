@@ -247,7 +247,7 @@ public class createMenu {
         custom.addElement(new ElementDropdown("请选择任务难度",list1));
         custom.addElement(new ElementInput("请输入任务介绍","例如: 收集10个橡木","收集10个橡木"));
         custom.addElement(new ElementInput("请输入任务完成条件(&区分多个元素)(自定义任务请输 内容:数量)","例如: 17:0:10@item 或 id:10@tag(收集任务)","17:0:10@item"));
-        custom.addElement(new ElementInput("请输入任务奖励(&区分多个元素)@item 为奖励物品 @tag奖励TagItem.json里的物品@money奖励金钱 @Cmd奖励指令","例如: 366:0:1@item 或 id@tag","366:0:1@item&100@money"));
+        custom.addElement(new ElementInput("请输入任务奖励(&区分多个元素)@item 为奖励物品 @tag奖励TagItem.json里的物品@money奖励金钱 @Cmd奖励指令(%p代表玩家)","例如: 366:0:1@item 或 id:1@tag","366:0:1@item&100@money"));
         send(player,custom,Create);
     }
 

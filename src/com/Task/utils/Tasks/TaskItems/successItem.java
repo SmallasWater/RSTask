@@ -167,7 +167,15 @@ public class successItem {
                 break;
             case "tag":
                 sItem = value.split("@")[0];
-                ItemClass itemClass = RSTask.getTask().getTagItemsConfig(sItem);
+                int c = 0;
+                String s = sItem;
+                if(sItem.split(":").length > 1){
+                    s = sItem.split(":")[0];
+                    c = Integer.parseInt(sItem.split(":")[1]);
+                }
+                ItemClass itemClass = RSTask.getTask().getTagItemsConfig(s);
+                if(c > 0)
+                    itemClass.getItem().setCount(c);
                 if(itemClass != null)
                     addItemClass(itemClass);
                 break;
@@ -186,7 +194,7 @@ public class successItem {
         }
     }
 
-    /** id:damage:count@item 或 id@tag 或 count@money 或 String@Cmd*/
+    /** id:damage:count@item 或 id:count@tag 或 count@money 或 String@Cmd*/
     public static successItem toSuccessItem(String string){
         if(string.split("@").length < 1) return null;
         switch (string.split("@")[1]) {
@@ -197,9 +205,20 @@ public class successItem {
                         Integer.parseInt(lists[1]),Integer.parseInt(lists[2]))});
             case "tag":
                 sItem = string.split("@")[0];
-                ItemClass itemClass = RSTask.getTask().getTagItemsConfig(sItem);
-                if(itemClass != null)
+                int c = 0;
+                String s = sItem;
+                if(sItem.split(":").length > 1){
+                    s = sItem.split(":")[0];
+                    c = Integer.parseInt(sItem.split(":")[1]);
+                }
+                ItemClass itemClass = RSTask.getTask().getTagItemsConfig(s);
+                if(itemClass != null){
+                    if(c > 0){
+                        itemClass.getItem().setCount(c);
+                    }
                     return new successItem(new ItemClass[]{itemClass});
+                }
+
                 else
                     return null;
             case "money":

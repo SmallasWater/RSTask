@@ -308,8 +308,9 @@ public class playerFile {
 
 
     /** 任务是否进行中 */
-    public boolean isRunning(String taskName){
-        return this.getTaskByName(taskName).getTaskClass().getOpen();
+    public boolean isRunning(String taskName) {
+        playerTask task = this.getTaskByName(taskName);
+        return task != null && task.getTaskClass().getOpen();
     }
 
 
@@ -318,8 +319,7 @@ public class playerFile {
         if(issetTask(taskFile.getTaskName())){
             if(isSuccess(taskFile)){
                     return PlayerTaskType.Success;
-            }else if(can_Invite(taskFile.getTaskName())
-                    && !isSuccessed(taskFile.getTaskName())){
+            }else if(can_Invite(taskFile.getTaskName())){
                 return PlayerTaskType.can_Invite;
             }else if(isRunning(taskFile.getTaskName())){
                 return PlayerTaskType.Running;
@@ -331,9 +331,17 @@ public class playerFile {
                 return PlayerTaskType.No_Invite;
             }
         }else{
-            return PlayerTaskType.can_Invite;
+            String last = taskFile.getLastTask();
+            if(last != null && !last.equals("null")){
+                if(issetTask(last) && isSuccessed(last)){
+                    return PlayerTaskType.can_Invite;
+                }else{
+                    return PlayerTaskType.No_Invite;
+                }
+            }else{
+                return PlayerTaskType.can_Invite;
+            }
         }
-
     }
 
     /** 获取完成过可领取任务 */
