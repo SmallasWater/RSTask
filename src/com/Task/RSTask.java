@@ -7,6 +7,7 @@ import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 
 import cn.nukkit.item.Item;
+import cn.nukkit.level.Level;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import com.Task.utils.Scorebroad.ScoreTask;
@@ -57,6 +58,8 @@ public class RSTask extends PluginBase{
                     Log.error("玩家文件初始化失败");
             }
         }
+
+
         if(!new File(this.getDataFolder()+"/config").exists()){
             this.saveDefaultConfig();
             this.reloadConfig();
@@ -228,6 +231,38 @@ public class RSTask extends PluginBase{
         return getConfig().getString("积分名称","§b积分§r");
     }
 
+    /** 判断是否开启世界独立任务*/
+    public boolean isWorldAloneTask(){
+        return getConfig().getBoolean("是否开启世界独立任务",false);
+    }
+
+    /** 如果开启，则初始化文件夹*/
+    public void initWorlds(){
+        for(Level level:Server.getInstance().getLevels().values()){
+            if(!new File(this.getDataFolder()+"/Worlds").exists()){
+                if(new File(this.getDataFolder()+"/Worlds").mkdir()){
+                    this.getLogger().info("Worlds文件夹创建成功");
+                }else{
+                    this.getLogger().info("Worlds文件夹创建失败");
+                }
+            }
+            if(!new File(this.getDataFolder()+"/Worlds/"+level.getFolderName()).exists()){
+                if(new File(this.getDataFolder()+"/Worlds/"+level.getFolderName()).mkdir()){
+                    this.getLogger().info("Worlds/"+level.getFolderName()+"文件夹创建成功");
+                }else{
+                    this.getLogger().info("Worlds/"+level.getFolderName()+"文件夹创建失败");
+                }
+            }
+            for(String i: Default_First_Name){
+                File file = new File(this.getDataFolder()+"/Worlds/"+level.getFolderName()+"/Players/"+i);
+                if(!file.exists()){
+                    if(!file.mkdirs())
+                        Log.error("玩家文件初始化失败");
+                }
+            }
+            this.getLogger().info("Worlds/"+level.getFolderName()+"/Players/文件夹创建成功");
+        }
+    }
 
 
     public Config getTaskConfig(String taskName){

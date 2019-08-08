@@ -62,7 +62,7 @@ public class TaskFile {
     private String broadcastMessage = "§l§c[§b任务系统§c]§e恭喜 §a%p §e完成了§d[ %s ]§e任务";
 
     /** 按键图片*/
-    private TaskButton button = new TaskButton("");
+    private TaskButton button;
 
 
     public enum TaskType{
@@ -111,10 +111,17 @@ public class TaskFile {
     }
 
     public TaskFile(String taskName, TaskType type, TaskItem[] taskItem, String taskMessage, int star, successItem item, String task, int day){
-        this(taskName,type,taskItem,taskMessage,star,item,null,task,day);
+        this(taskName,type,taskItem,taskMessage,star,item,null,task,day,0);
     }
 
-    public TaskFile(String taskName, TaskType type, TaskItem[] taskItem, String taskMessage, int star, successItem item,successItem firstItem, String task, int day){
+    public TaskFile(String taskName, TaskType type, TaskItem[] taskItem, String taskMessage, int star, successItem item,successItem firstItem, String task, int day,int MessageType){
+        this(taskName,type,taskItem,taskMessage,star,item,firstItem,task,day,MessageType,"§l§c[§b任务系统§c]§e恭喜 §a%p §e完成了§d[ %s ]§e任务");
+    }
+    public TaskFile(String taskName, TaskType type, TaskItem[] taskItem, String taskMessage, int star, successItem item,successItem firstItem, String task, int day,int MessageType,String broadcastMessage){
+        this(taskName,type,taskItem,taskMessage,star,item,firstItem,task,day,MessageType,broadcastMessage,new TaskButton(""));
+    }
+
+    public TaskFile(String taskName, TaskType type, TaskItem[] taskItem, String taskMessage, int star, successItem item,successItem firstItem, String task, int day,int MessageType,String broadcastMessage,TaskButton button){
         this.type = type;
         this.taskItem = taskItem;
         this.TaskName = taskName;
@@ -124,6 +131,9 @@ public class TaskFile {
         this.task = task;
         this.day = day;
         this.fristSuccessItem = firstItem;
+        this.MessageType = MessageType;
+        this.button = button;
+        this.broadcastMessage = broadcastMessage;
     }
 
     public TaskType getType() {
@@ -334,9 +344,11 @@ public class TaskFile {
 
                 if(type == null) return null;
 
+
                 return new TaskFile(taskName,type,taskItems,config.getString("任务介绍")
                         ,config.getInt("任务难度"),success,first,config.getString("完成此任务前需完成"),
-                        +config.getInt("刷新时间(天)"));
+                        +config.getInt("刷新时间(天)"),config.getInt("完成公告类型(0/1)"),config.getString("公告内容"),TaskButton.toTaskButton((Map) config.get("自定义按键图片")));
+
             }
 
         }catch (Exception e){

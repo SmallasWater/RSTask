@@ -23,12 +23,12 @@ public class TaskButton {
         }
     }
 
-    private static ButtonImageType type;
+    private ButtonImageType type;
 
 
-    public static String text;
+    private String text;
 
-    public static String data;
+    private String data;
 
     public TaskButton(String text){
         this(text,ButtonImageType.Path,"textures/items/book_enchanted");
@@ -41,16 +41,7 @@ public class TaskButton {
        data = ButtonData;
     }
 
-    public static LinkedHashMap<String,Object> toButton(String text){
 
-        LinkedHashMap<String,Object> linkedHashMap = new LinkedHashMap<>(),
-                                     image = new LinkedHashMap<>();
-        image.put("type",type == ButtonImageType.Path?"path":"url");
-        image.put("data",data);
-        linkedHashMap.put("text",text);
-        linkedHashMap.put("image",image);
-        return linkedHashMap;
-    }
 
 
     public ElementButton toButton(){
@@ -60,16 +51,16 @@ public class TaskButton {
         return elementButton;
     }
 
-    public static void setText(String text) {
-        TaskButton.text = text;
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public static void setData(String data) {
-        TaskButton.data = data;
+    public void setData(String data) {
+        this.data = data;
     }
 
-    public static void setType(ButtonImageType type) {
-        TaskButton.type = type;
+    public void setType(ButtonImageType type) {
+        this.type = type;
     }
 
 
@@ -82,13 +73,15 @@ public class TaskButton {
 
     public static TaskButton toTaskButton(Map map){
         if(map == null) return null;
+        ButtonImageType type;
+        String data;
         if(map.containsKey("位置")){
-            TaskButton.type = map.get("位置").equals("本地")?ButtonImageType.Path:ButtonImageType.Url;
+            type = map.get("位置").equals("本地")?ButtonImageType.Path:ButtonImageType.Url;
         }else{
             return null;
         }
         if(map.containsKey("路径")){
-            TaskButton.data = (String) map.get("路径");
+            data = (String) map.get("路径");
         }else{
             return null;
         }
