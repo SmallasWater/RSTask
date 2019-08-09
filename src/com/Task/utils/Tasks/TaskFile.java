@@ -309,6 +309,7 @@ public class TaskFile {
     }
 
     public static TaskFile getTask(String taskName){
+
         try{
             if(isFileTask(taskName)){
                 Config config = RSTask.getTask().getTaskConfig(taskName);

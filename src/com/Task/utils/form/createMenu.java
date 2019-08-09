@@ -45,17 +45,16 @@ public class createMenu {
                 String s = " ";
                 if(RSTask.canOpen()){
                     if(playerFile.canLock(i)){
-                        if(playerFile.getCanInviteTasks(i).size() > 0){
-                            s = (RSTask.getTask().getLag("task-message-can-receive").replace("%c",playerFile.getCanInviteTasks(i).size()+""));
-                        }
-                        if(playerFile.getInviteTasks().size() > 0){
-                            s = (RSTask.getTask().getLag("task-message-lodding").replace("%c",playerFile.getInviteTasks().size()+""));
-                        }
-                        if(playerFile.getSuccessTasks().size() > 0){
-                            s = (RSTask.getTask().getLag("task-message-success").replace("%c",playerFile.getSuccessTasks().size()+""));
-                        }
-                        if(playerFile.getCanInviteTasks(i).size() == 0 && playerFile.getInviteTasks().size() == 0 && playerFile.getSuccessTasks().size() == 0){
-                            s = (RSTask.getTask().getLag("success-all"));
+                        if(RSTask.getTask().canShowLodding()){
+                            if(playerFile.getCanInviteTasks(i).size() == 0 && playerFile.getInviteTasks(i).size() == 0 && playerFile.getSuccessTasks(i).size() == 0){
+                                s = (RSTask.getTask().getLag("success-all"));
+                            }else if(playerFile.getSuccessTasks(i).size() > 0){
+                                s = (RSTask.getTask().getLag("task-message-success").replace("%c",playerFile.getSuccessTasks(i).size()+""));
+                            }else if(playerFile.getInviteTasks(i).size() > 0){
+                                s = (RSTask.getTask().getLag("task-message-lodding").replace("%c",playerFile.getInviteTasks(i).size()+""));
+                            }else if(playerFile.getCanInviteTasks(i).size() > 0){
+                                s = (RSTask.getTask().getLag("task-message-can-receive").replace("%c",playerFile.getCanInviteTasks(i).size()+""));
+                            }
                         }
                     }else{
                         s = (RSTask.getTask().getLag("Lock").replace("%c",RSTask.starNeed(i)+"").replace("%f",RSTask.getTask().getFName()));

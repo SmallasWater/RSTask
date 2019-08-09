@@ -366,6 +366,7 @@ public class playerFile {
         return tasks;
     }
 
+
     /** 获取不能领取任务 */
     public LinkedList<playerTask> getNoInviteTasks(int star){
         LinkedList<playerTask> tasks = new LinkedList<>();
@@ -387,9 +388,52 @@ public class playerFile {
         return getTasksByType(PlayerTaskType.Running);
     }
 
+    public LinkedList<playerTask> getInviteTasks(int level){
+        return getTasksByType(PlayerTaskType.Running,level);
+    }
+
     /** 获取已完成(达到要求)任务 */
     public LinkedList<playerTask> getSuccessTasks(){
         return getTasksByType(PlayerTaskType.Success);
+    }
+
+    public LinkedList<playerTask> getSuccessTasks(int level){
+        return getTasksByType(PlayerTaskType.Success,level);
+    }
+
+
+
+
+    public LinkedList<playerTask> getTasksByType(PlayerTaskType taskType,int level){
+        LinkedList<playerTask> tasks = new LinkedList<>();
+        for(playerTask task:playerTasks){
+            if(task.getTaskFile().getStar() == level){
+                switch (taskType){
+                    case Success:
+                        if(isSuccess(task.getTaskName()))
+                            tasks.add(task);
+                        break;
+                    case Running:
+                        if(isRunning(task.getTaskName()) && !isSuccess(task.getTaskName()))
+                            tasks.add(task);
+                        break;
+                    case isSuccess_noInvite:
+                        if(isSuccessed(task.getTaskName()) && !can_Invite(task.getTaskName()))
+                            tasks.add(task);
+                        break;
+
+                    case isSuccess_canInvite:
+                        if(isSuccessed(task.getTaskName()) && can_Invite(task.getTaskName()))
+                            tasks.add(task);
+                        break;
+                    case can_Invite:
+                        if(can_Invite(task.getTaskName()))
+                            tasks.add(task);
+                        break;
+                }
+            }
+        }
+        return tasks;
     }
 
     public enum PlayerTaskType{

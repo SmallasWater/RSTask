@@ -6,6 +6,7 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 
+import cn.nukkit.event.EventHandler;
 import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.plugin.PluginBase;
@@ -51,6 +52,8 @@ public class RSTask extends PluginBase{
         if(!taskFiles.exists())
             if(!taskFiles.mkdirs())
                 Log.error("创建Tasks文件夹失败");
+
+
         for(String i: Default_First_Name){
             File file = new File(this.getDataFolder()+"/Players/"+i);
             if(!file.exists()){
@@ -122,6 +125,8 @@ public class RSTask extends PluginBase{
     }
 
 
+
+
     /** 判断是否存在*/
     public boolean canExisteItemClass(ItemClass itemClass){
         Config config = new Config(this.getDataFolder()+"/TagItem.json",Config.JSON);
@@ -181,6 +186,7 @@ public class RSTask extends PluginBase{
         return playerNames;
     }
 
+
     private static List<String> getAllFiles(File dir, List<String> filelist){
         File[] fs = dir.listFiles();
         if(fs != null){
@@ -231,12 +237,23 @@ public class RSTask extends PluginBase{
         return getConfig().getString("积分名称","§b积分§r");
     }
 
-    /** 判断是否开启世界独立任务*/
+    /** 获取积分名称*/
+    public boolean canShowLodding(){
+        return getConfig().getBoolean("主页面是否显示数量",true);
+    }
+
+
+
+    /** 判断是否开启世界独立任务
+     * @deprecated 无
+     * */
+
     public boolean isWorldAloneTask(){
         return getConfig().getBoolean("是否开启世界独立任务",false);
     }
 
-    /** 如果开启，则初始化文件夹*/
+    /** 如果开启，则初始化文件夹
+     * @deprecated */
     public void initWorlds(){
         for(Level level:Server.getInstance().getLevels().values()){
             if(!new File(this.getDataFolder()+"/Worlds").exists()){
