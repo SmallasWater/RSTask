@@ -112,13 +112,15 @@ public class PlayerTaskClass {
     }
 
     public static PlayerTaskClass toPlayerTaskClass(String taskName, Map map){
-        if(map == null) return null;
+        if(map == null) {
+            return null;
+        }
         Map maps = (Map) map.get("load");
         TaskItem[] values = new TaskItem[maps.size()];
         int i = 0;
-        for(Object So:maps.keySet()){
+        for(Object so :maps.keySet()){
             values[i] = TaskItem.toTaskItem(taskName,new LinkedHashMap<String,Integer>(){{
-                put(String.valueOf(So),(int)maps.get(So));}});
+                put(String.valueOf(so),(int)maps.get(so));}});
             i++;
         }
         Date time = DataTool.getDate((String) map.get("time"));
@@ -134,5 +136,8 @@ public class PlayerTaskClass {
         this.count = count;
     }
 
-
+    @Override
+    public String toString() {
+        return toSaveConfig().toString();
+    }
 }

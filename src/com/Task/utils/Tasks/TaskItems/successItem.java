@@ -4,6 +4,7 @@ package com.Task.utils.Tasks.TaskItems;
 
 
 import com.Task.RSTask;
+import com.Task.utils.ItemIDSunName;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -157,7 +158,9 @@ public class successItem {
     }
 
     public void add(String value){
-        if(value.split("@").length < 1) return;
+        if(value.split("@").length < 1) {
+            return;
+        }
         switch (value.split("@")[1]) {
             case "item":
                 String sItem = value.split("@")[0];
@@ -174,10 +177,12 @@ public class successItem {
                     c = Integer.parseInt(sItem.split(":")[1]);
                 }
                 ItemClass itemClass = RSTask.getTask().getTagItemsConfig(s);
-                if(c > 0)
+                if(c > 0) {
                     itemClass.getItem().setCount(c);
-                if(itemClass != null)
+                }
+                if(itemClass != null) {
                     addItemClass(itemClass);
+                }
                 break;
             case "money":
                 int money;
@@ -191,12 +196,16 @@ public class successItem {
             case "Cmd":
                 sItem = value.split("@")[0];
                 addCmdClass(CommandClass.toCommandClass(sItem));
+                default:
+                    break;
         }
     }
 
     /** id:damage:count@item 或 id:count@tag 或 count@money 或 String@Cmd*/
     public static successItem toSuccessItem(String string){
-        if(string.split("@").length < 1) return null;
+        if(string.split("@").length < 1) {
+            return null;
+        }
         switch (string.split("@")[1]) {
             case "item":
                 String sItem = string.split("@")[0];
@@ -219,8 +228,9 @@ public class successItem {
                     return new successItem(new ItemClass[]{itemClass});
                 }
 
-                else
+                else {
                     return null;
+                }
             case "money":
                 int money;
                 try {
@@ -232,11 +242,50 @@ public class successItem {
             case "Cmd":
                 sItem = string.split("@")[0];
                 return new successItem(new CommandClass[]{CommandClass.toCommandClass(sItem)});
+                default:
+                    return null;
         }
-        return null;
     }
 
+    public LinkedList<StringBuilder> toList() {
+        LinkedList<StringBuilder> builders = new LinkedList<>();
+        ItemClass[] classes = getItem();
+        CommandClass[] commandClasses = getCmd();
+        if(classes != null && classes.length > 0){
+            for(ItemClass itemClass:classes){
+                if(itemClass != null){
+                    StringBuilder builder1 = new StringBuilder();
+                    builder1.append(ItemIDSunName.getIDByName(itemClass.getItem())).append("*").append(itemClass.getItem().getCount());
+                    builders.add(builder1);
+                }
+            }
+        }
+        if(commandClasses != null && commandClasses.length > 0){
+            for(CommandClass commandClass:commandClasses){
+                if(commandClass != null){
+                    StringBuilder builder1 = new StringBuilder("");
+                    builder1.append(commandClass.getSendMessage());
+                    builders.add(builder1);
+                }
+            }
+        }
+        if(getMoney() > 0){
+            builders.add(new StringBuilder(RSTask.getTask().getCoinName()).append(">").append(getMoney()));
+        }
+        if(RSTask.canOpen()){
+            if(getCount() > 0){
+                builders.add(new StringBuilder(RSTask.getTask().getFName()).append(">").append(getCount()));
+            }
+        }
+        return builders;
+    }
 
-
-
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (StringBuilder builder1:toList()){
+            builder.append(builder1).append("\n");
+        }
+        return builder.toString();
+    }
 }

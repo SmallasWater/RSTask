@@ -8,14 +8,18 @@
 # @author 若水
 name: RSTask
 api: ["1.0.8"]
-version: "1.2.1"
+version: "1.3.9"
 main: com.Task.RSTask
 author: "若水"
 load: POSTWORLD
 commands:
  c:
-  description: §6任务系统
+  description: §6任务系统UI
   usage: /c
+ reload-task:
+  description: §c重新同步任务文件
+  usage: /reload-task
+  permission: RSTask.command.reload-task
  sh:
   description: §d保存手上的物品到ItemTag
   usage: /sh
@@ -27,6 +31,9 @@ commands:
  del-task:
   description: §e删除任务
   permission: RSTask.command.del-task
+ cbook:
+  description: §a指令获得任务书
+
 
 permissions:
  RSTask.command.sh:
@@ -37,4 +44,7 @@ permissions:
   default: op
  RSTask.command.del-task:
   description: §e删除任务
+  default: op
+ RSTask.command.reload-task:
+  description: §c重新同步任务文件
   default: op

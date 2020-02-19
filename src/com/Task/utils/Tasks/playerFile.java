@@ -3,11 +3,9 @@ package com.Task.utils.Tasks;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
-import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.utils.Config;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
-import com.Task.utils.ItemIDSunName;
 import com.Task.utils.Tasks.TaskItems.*;
 import com.Task.utils.events.successTaskEvent;
 import java.util.Date;
@@ -16,22 +14,34 @@ import java.util.LinkedList;
 import java.util.Map;
 
 
+/**
+ * @author 若水
+ */
 public class playerFile {
 
     private String playerName;
 
     private LinkedList<playerTask> playerTasks = new LinkedList<>();
 
+    public static playerFile getPlayerFile(String playerName){
+        if(RSTask.getTask().playerFiles.containsKey(playerName)){
+            return RSTask.getTask().playerFiles.get(playerName);
+        }
+        return new playerFile(playerName);
+    }
+
+
+    public String getPlayerName() {
+        return playerName;
+    }
 
     public playerFile(String playerName){
         this.playerName = playerName;
         this.init();
-        if(canSyncTaskItem()){
-            this.init(true);
-        }
     }
 
     private boolean canSyncTaskItem(){
+
         for(playerTask task:playerTasks){
             if(task.getTaskFile() == null){
                 playerTasks.remove(task);
@@ -55,34 +65,27 @@ public class playerFile {
 
 
     //* 初始化
-    private void init(){
-        this.init(false);
-    }
 
-    private void init(boolean sync){
-        if(!sync){
-            Config config = RSTask.getTask().getPlayerConfig(playerName);
-            LinkedList<playerTask> tasks = new LinkedList<>();
-            Map map = (Map) config.get("Task");
-            if(map != null){
-                for(Object name:map.keySet()){
-                    tasks.add(new playerTask
-                            (PlayerTaskClass.toPlayerTaskClass((String)name,(Map)map.get(name))));
+
+    private void init(){
+        Config config = RSTask.getTask().getPlayerConfig(playerName);
+        LinkedList<playerTask> tasks = new LinkedList<>();
+        Map map = (Map) config.get("Task");
+        if(map != null){
+            for(Object name:map.keySet()){
+                PlayerTaskClass taskClass = PlayerTaskClass.toPlayerTaskClass((String)name,(Map)map.get(name));
+                if(taskClass != null){
+                    tasks.add(new playerTask(taskClass));
                 }
+
             }
-            this.playerTasks = tasks;
-        }else{
-            LinkedList<playerTask> newTask = new LinkedList<>();
-            for(playerTask task:playerTasks){
-                newTask.add(new playerTask(TaskFile.getTask(task.getTaskName())));
-            }
-            this.playerTasks = newTask;
         }
+        this.playerTasks = tasks;
+
     }
 
     /** 玩家是否有这个任务 */
     public boolean issetTask(String taskName){
-        init();
         for(playerTask T:playerTasks){
             if(T.getTaskName().equals(taskName)){
                 return true;
@@ -120,14 +123,13 @@ public class playerFile {
         if(!issetTask(task)){
             task.getTaskClass().setOpen(true);
             playerTasks.add(task);
-            toSaveConfig(defaultConfig());
+
         }else{
             playerTask t = getTaskByName(task.getTaskName());
             PlayerTaskClass playerTaskClass = t.getTaskClass();
             playerTaskClass.setOpen(true);
             playerTaskClass.setTime(new Date());
             t.setTaskClass(playerTaskClass);
-            toSaveConfig(defaultConfig());
         }
     }
 
@@ -144,7 +146,6 @@ public class playerFile {
                 }
             }
             playerTasks = tasks;
-            toSaveConfig(defaultConfig());
             return true;
         }
         return false;
@@ -160,17 +161,21 @@ public class playerFile {
 
     /** 给玩家任务的分支加点*/
     public boolean addTaskValue(String taskName,String valueName,int value){
-        TaskItem[] taskItems = getTaskByName(taskName).getTaskClass().getValue();
-        for(TaskItem item:taskItems){
-            if(item != null) {
-                if (item.getTask().equals(valueName)) {
-                    item.addEndCount(value);
-                    setTaskValue(taskName, item);
-                    return true;
+        playerTask task = getTaskByName(taskName);
+        if(task != null){
+            TaskItem[] taskItems = task.getTaskClass().getValue();
+            for(TaskItem item:taskItems){
+                if(item != null) {
+                    if (item.getTask().equals(valueName)) {
+                        item.addEndCount(value);
+                        setTaskValue(taskName, item);
+                        return true;
+                    }
                 }
-            }
 
+            }
         }
+
         return false;
     }
 
@@ -190,7 +195,7 @@ public class playerFile {
             }else{
                 delTask(taskName);
             }
-            toSaveConfig(defaultConfig());
+            toSave();
             return true;
         }
         return false;
@@ -198,17 +203,21 @@ public class playerFile {
 
     /** 给玩家任务的分支设置任务点*/
     public boolean setTaskValue(String taskName,String valueName,int value){
-        TaskItem[] taskItems = getTaskByName(taskName).getTaskClass().getValue();
-        for(TaskItem item:taskItems){
-            if(item != null){
-                if(item.getTask().equals(valueName)){
-                    item.setEndCount(value);
-                    setTaskValue(taskName,item);
-                    return true;
+        playerTask task = getTaskByName(taskName);
+        if(task != null){
+            TaskItem[] taskItems = task.getTaskClass().getValue();
+            for(TaskItem item:taskItems){
+                if(item != null){
+                    if(item.getTask().equals(valueName)){
+                        item.setEndCount(value);
+                        setTaskValue(taskName,item);
+                        return true;
+                    }
                 }
-            }
 
+            }
         }
+
         return false;
     }
 
@@ -231,19 +240,16 @@ public class playerFile {
             tasks.sync(task);
         }else{
             addTask(task);
-            init();
             if(!issetTask(task)){
                 Server.getInstance().getLogger().warning("读取玩家任务出现异常");
             }
         }
-        toSaveConfig(defaultConfig());
     }
 
 
 
     /** 根据任务名获取分支任务 */
     public playerTask getTaskByName(String taskName){
-        init();
         for(playerTask task:playerTasks){
             if(task.getTaskName().equals(taskName)){
                 return task;
@@ -252,31 +258,42 @@ public class playerFile {
         return null;
     }
 
+
+
     /** 是否能领取 */
-    public boolean can_Invite(String taskName){
+    public boolean canInvite(String taskName){
         TaskFile file = TaskFile.getTask(taskName);
-        if(file != null){
-            if(!issetTask(taskName)){
-                String last = file.getLastTask();
-                if(last != null && !last.equals("null")){
-                    if(!issetTask(last))
-                        return false;
-                    else if(!isSuccessed(last))
-                            return false;
-                }
-            }else {
-                if (!inDay(taskName)) {
-                   return false;
-                }
-                if (file.getSuccessItem().getCount() == 0
-                        && isSuccessed(taskName)) {
+        if(file != null) {
+            // 任务上一级
+            String last = file.getLastTask();
+            //判断玩家是否做过这个
+            if (issetTask(taskName)) {
+
+                if (isRunning(taskName)) {
                     return false;
                 }
-                if(isRunning(taskName))
+                if(isSuccess(taskName)){
                     return false;
+                }
+
+                if (file.getSuccessItem().getCount() != 0) {
+                    if (file.getDay() > 0) {
+                        return inDay(taskName);
+                    }else{
+                        return true;
+                    }
+                }
+
+                //计算冷却时间
+            } else {
+                if (last != null && !last.equals("null")) {
+                    return isSuccessed(last);
+                }else{
+                    return true;
+                }
             }
         }
-            return true;
+        return false;
     }
 
 
@@ -299,37 +316,43 @@ public class playerFile {
         if(task != null && file != null){
             Date date = task.getTaskClass().getTime();
             int t = file.getDay();
-            if(t >= 0 && DataTool.getTime(date) >= t){
-                return true;
+            if(t > 0){
+                return DataTool.getTime(date) > t;
             }
+
         }
-        return false;
+        return true;
     }
 
 
     /** 任务是否进行中 */
     public boolean isRunning(String taskName) {
         playerTask task = this.getTaskByName(taskName);
-        return task != null && task.getTaskClass().getOpen();
+        return !isSuccess(taskName) && task != null && task.getTaskClass().getOpen();
     }
 
 
     /** 获取任务状态 */
     public PlayerTaskType getTaskType(TaskFile taskFile){
         if(issetTask(taskFile.getTaskName())){
-            if(isSuccess(taskFile)){
-                    return PlayerTaskType.Success;
-            }else if(can_Invite(taskFile.getTaskName())){
+            if(canInvite(taskFile.getTaskName()) && !isSuccessed(taskFile.getTaskName())){
                 return PlayerTaskType.can_Invite;
-            }else if(isRunning(taskFile.getTaskName())){
-                return PlayerTaskType.Running;
-            }else if(isSuccessed(taskFile.getTaskName()) && !can_Invite(taskFile.getTaskName())){
-                return PlayerTaskType.isSuccess_noInvite;
-            }else if(isSuccessed(taskFile.getTaskName()) && can_Invite(taskFile.getTaskName())){
-                return PlayerTaskType.isSuccess_canInvite;
-            }else {
-                return PlayerTaskType.No_Invite;
+            }else{
+                if(isSuccessed(taskFile.getTaskName()) && canInvite(taskFile.getTaskName())){
+                    return PlayerTaskType.isSuccess_canInvite;
+                }else{
+                    if(isRunning(taskFile.getTaskName())){
+                        return PlayerTaskType.Running;
+                    }
+                    if(isSuccessed(taskFile.getTaskName()) && !canInvite(taskFile.getTaskName())){
+                        return PlayerTaskType.isSuccess_noInvite;
+                    }
+                    if(isSuccess(taskFile)){
+                        return PlayerTaskType.Success;
+                    }
+                }
             }
+            return PlayerTaskType.No_Invite;
         }else{
             String last = taskFile.getLastTask();
             if(last != null && !last.equals("null")){
@@ -359,7 +382,7 @@ public class playerFile {
         LinkedList<playerTask> tasks = new LinkedList<>();
         LinkedList<TaskFile> taskFiles = TaskFile.getDifficultyTasks(star);
         for(TaskFile file:taskFiles){
-            if(can_Invite(file.getTaskName())){
+            if(canInvite(file.getTaskName())){
                 tasks.add(new playerTask(file));
             }
         }
@@ -374,7 +397,7 @@ public class playerFile {
         for(TaskFile file:taskFiles){
             if(file.getSuccessItem().getCount() == 0){
                 tasks.add(new playerTask(file));
-            }else if(isSuccess(file.getTaskName()) && !inDay(file.getTaskName())){
+            }else if(isSuccess(file.getTaskName()) && inDay(file.getTaskName())){
                 tasks.add(new playerTask(file));
             }
         }
@@ -408,28 +431,8 @@ public class playerFile {
         LinkedList<playerTask> tasks = new LinkedList<>();
         for(playerTask task:playerTasks){
             if(task.getTaskFile().getStar() == level){
-                switch (taskType){
-                    case Success:
-                        if(isSuccess(task.getTaskName()))
-                            tasks.add(task);
-                        break;
-                    case Running:
-                        if(isRunning(task.getTaskName()) && !isSuccess(task.getTaskName()))
-                            tasks.add(task);
-                        break;
-                    case isSuccess_noInvite:
-                        if(isSuccessed(task.getTaskName()) && !can_Invite(task.getTaskName()))
-                            tasks.add(task);
-                        break;
-
-                    case isSuccess_canInvite:
-                        if(isSuccessed(task.getTaskName()) && can_Invite(task.getTaskName()))
-                            tasks.add(task);
-                        break;
-                    case can_Invite:
-                        if(can_Invite(task.getTaskName()))
-                            tasks.add(task);
-                        break;
+                if(getTaskType(task.getTaskFile()) == taskType){
+                    tasks.add(task);
                 }
             }
         }
@@ -437,31 +440,25 @@ public class playerFile {
     }
 
     public enum PlayerTaskType{
-        can_Invite, Success,No_Invite,Running,isSuccess_canInvite,isSuccess_noInvite,
+        /** 是否可以被领取*/
+        can_Invite,
+        /** 完成*/
+        Success,
+        /** 不能被领取*/
+        No_Invite,
+        /** 进行中*/
+        Running,
+        /** 完成后可以领取*/
+        isSuccess_canInvite,
+        /** 完成后不能领取*/
+        isSuccess_noInvite,
     }
 
     private LinkedList<playerTask> getTasksByType(PlayerTaskType taskType){
-        init();
         LinkedList<playerTask> tasks = new LinkedList<>();
         for(playerTask task:playerTasks) {
-            switch (taskType) {
-                case Success:
-                    if(isSuccess(task.getTaskName()))
-                        tasks.add(task);
-                    break;
-                case Running:
-                    if(isRunning(task.getTaskName()) && !isSuccess(task.getTaskName()))
-                        tasks.add(task);
-                    break;
-                case isSuccess_noInvite:
-                    if(isSuccessed(task.getTaskName()) && !can_Invite(task.getTaskName()))
-                        tasks.add(task);
-                    break;
-
-                case isSuccess_canInvite:
-                    if(isSuccessed(task.getTaskName()) && can_Invite(task.getTaskName()))
-                        tasks.add(task);
-                    break;
+            if(getTaskType(task.getTaskFile())==taskType){
+                tasks.add(task);
             }
         }
         return tasks;
@@ -470,7 +467,7 @@ public class playerFile {
     /** 判断此难度是否解锁(需开启积分验证)
      1级难度默认解锁 */
     public boolean canLock(int star) {
-        return !RSTask.getTask().getConfig().getBoolean("是否开启积分验证") || (getCount() >= RSTask.starNeed(star));
+        return !RSTask.countChecking || (getCount() >= RSTask.starNeed(star));
     }
 
 
@@ -479,10 +476,8 @@ public class playerFile {
         if(!issetTask(file)){
             return true;
         }else{
-            if(this.getTaskByName(file.getTaskName()).getTaskClass().getCount() == 0)
-                return true;
+            return this.getTaskByName(file.getTaskName()).getTaskClass().getCount() == 0;
         }
-        return false;
     }
 
 
@@ -498,20 +493,18 @@ public class playerFile {
 
     /** 任务是否完成 */
     public boolean isSuccess(TaskFile taskName){
-        init();
         if(issetTask(taskName.getTaskName())){
             PlayerTaskClass use = getTaskByName(taskName.getTaskName()).getTaskClass();
             if(use.getOpen()){
                 int i = 0;
                 for(TaskItem item:use.getValue()){
-                    if(item != null)
+                    if(item != null) {
                         if(TaskItemSuccess(item,taskName)){
                             i++;
                         }
+                    }
                 }
-                if(i == use.getValue().length){
-                    return true;
-                }
+                return i == use.getValue().length;
             }
         }
         return false;
@@ -521,8 +514,9 @@ public class playerFile {
     private boolean TaskItemSuccess(TaskItem item,TaskFile file){
         for(TaskItem item1:file.getTaskItem()){
             if(item.equals(item1)){
-                if(item.getEndCount() >= item1.getEndCount())
+                if(item.getEndCount() >= item1.getEndCount()) {
                     return true;
+                }
             }
         }
         return false;
@@ -581,7 +575,7 @@ public class playerFile {
         PlayerTaskClass playerTaskClass = task.getTaskClass();
         playerTaskClass.setLoad(item);
         task.setTaskClass(playerTaskClass);
-        toSaveConfig(defaultConfig());
+
 //
     }
 
@@ -606,15 +600,15 @@ public class playerFile {
     }
 
 
-    public static playerFile getPlayerFile(String playerName){
-        return new playerFile(playerName);
-    }
-
-
-
     private void toSaveConfig(LinkedHashMap<String,Object> maps){
         Config config = RSTask.getTask().getPlayerConfig(playerName);
         config.setAll(maps);
+        config.save();
+    }
+
+    public void toSave(){
+        Config config = RSTask.getTask().getPlayerConfig(playerName);
+        config.setAll(defaultConfig());
         config.save();
     }
 
@@ -641,4 +635,9 @@ public class playerFile {
     }
 
 
+
+    @Override
+    public String toString() {
+        return defaultConfig().toString()+"; tasks: "+playerTasks.toString();
+    }
 }

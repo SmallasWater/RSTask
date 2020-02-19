@@ -47,6 +47,10 @@ enable-EconomyAPi: true
 # 但是这样会导致打开任务菜单卡顿
 主页面是否显示数量: true
 
+领取任务是否给予任务书: true
+
+完成任务是否直接领取奖励: false
+
 是否使用计分板: true
 
 计分板:

@@ -1,7 +1,7 @@
 package com.Task.utils.Tasks.TaskItems;
 
-import cn.nukkit.Server;
-import com.Task.utils.Tasks.TaskFile;
+import com.Task.utils.ItemIDSunName;
+import com.Task.utils.Tasks.playerFile;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,37 +15,38 @@ public class TaskItem {
 
     private String taskName;
 
-    private int EndCount;
+    private int endCount;
 
     //任务分支名称
-    private String Task;
+    private String task;
 
-    public TaskItem(String taskName,String Task,int endCount){
-        this.Task = Task;
-        this.EndCount = endCount;
+    public TaskItem(String taskName,String task,int endCount){
+        this.task = task;
+        this.endCount = endCount;
         this.taskName = taskName;
     }
 
     public int getEndCount() {
-        return EndCount;
+        return endCount;
     }
 
 
     /** 获取任务分支名称 */
     public String getTask() {
-        return Task;
+        return task;
     }
 
 
+    @Override
     public String toString(){
-        return Task+":"+EndCount;
+        return task+":"+endCount;
     }
 
 
     public LinkedHashMap<String,Integer> toSaveConfig(){
         return new LinkedHashMap<String,Integer>(){
             {
-                put(Task,EndCount);
+                put(task,endCount);
             }
         };
     }
@@ -53,12 +54,14 @@ public class TaskItem {
 
     /** 检测Task标签 */
     public TaskItemTag getTaskTag(){
-        if(Task.split("@").length > 1){
-            switch (Task.split("@")[1]){
+        if(task.split("@").length > 1){
+            switch (task.split("@")[1]){
                 case "tag":
                     return TaskItemTag.NbtItem;
                 case "item":
                     return TaskItemTag.defaultItem;
+                    default:
+                        break;
             }
         }
         return TaskItemTag.diyName;
@@ -78,7 +81,7 @@ public class TaskItem {
 
 
     public boolean equals(TaskItem item) {
-        return item != null && item.getTask().equals(Task);
+        return item != null && item.getTask().equals(task);
 
     }
 
@@ -90,7 +93,9 @@ public class TaskItem {
 
 
     public static TaskItem toTaskItem(String taskName,Map<? extends String,? extends Integer> map){
-        if(map == null) return null;
+        if(map == null) {
+            return null;
+        }
         for (String tag : map.keySet()) {
             int ints = map.get(tag);
             if(tag != null){
@@ -101,17 +106,19 @@ public class TaskItem {
     }
 
     public void setEndCount(int endCount) {
-        EndCount = endCount;
+        this.endCount = endCount;
     }
 
     public void addEndCount(int value){
-        EndCount += value;
+        this.endCount += value;
     }
 
 
     /** defaultString: id:damage:count@item 或 id:count@tag 或 内容:id*/
     public static TaskItem toTaskItem(String taskName,String defaultString){
-        if(defaultString.split("@").length < 1) return null;
+        if(defaultString.split("@").length < 1) {
+            return null;
+        }
         if(defaultString.split("@").length > 1){
             switch (defaultString.split("@")[1]){
                 case "item":
@@ -122,9 +129,12 @@ public class TaskItem {
                     sItem = defaultString.split("@")[0];
                     lists = sItem.split(":");
                     return new TaskItem(taskName,lists[0]+"@tag",Integer.parseInt(lists[1]));
+                    default:
+                        break;
             }
         }
         String[] lists = defaultString.split(":");
         return new TaskItem(taskName,lists[0],Integer.parseInt(lists[1]));
     }
+
 }

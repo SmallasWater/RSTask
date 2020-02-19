@@ -15,8 +15,10 @@ import cn.nukkit.event.entity.EntityInventoryChangeEvent;
 import cn.nukkit.event.inventory.CraftItemEvent;
 import cn.nukkit.event.player.*;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
+import cn.nukkit.scheduler.AsyncTask;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
 import com.Task.utils.ItemIDSunName;
@@ -26,18 +28,21 @@ import com.Task.utils.Tasks.TaskItems.*;
 import com.Task.utils.Tasks.playerFile;
 import com.Task.utils.events.*;
 import com.Task.utils.form.createMenu;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.concurrent.*;
 
 public class ListerEvents implements Listener{
-    private LinkedList<Player> giveUp = new LinkedList<>();
+
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onBreak(BlockBreakEvent event){
         Player player = event.getPlayer();
-        if(event.isCancelled()) return;
+        if(event.isCancelled()) {
+            return;
+        }
         Block block = event.getBlock();
         String s = block.getId()+":"+block.getDamage()+"@item";
         defaultUseTask(player.getName(),s, TaskFile.TaskType.BlockBreak,false);
@@ -47,7 +52,9 @@ public class ListerEvents implements Listener{
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlace(BlockPlaceEvent event){
         Player player = event.getPlayer();
-        if(event.isCancelled()) return;
+        if(event.isCancelled()) {
+            return;
+        }
         Block block = event.getBlock();
         String s = block.getId()+":"+block.getDamage()+"@item";
         defaultUseTask(player.getName(),s, TaskFile.TaskType.BlockPlayer,false);
@@ -57,7 +64,9 @@ public class ListerEvents implements Listener{
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUseItem(PlayerItemConsumeEvent event){
         Player player = event.getPlayer();
-        if(event.isCancelled()) return;
+        if(event.isCancelled()) {
+            return;
+        }
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.EatItem);
     }
@@ -65,29 +74,37 @@ public class ListerEvents implements Listener{
     @EventHandler(priority = EventPriority.MONITOR)
     public void onDropItem(PlayerDropItemEvent event){
         Player player = event.getPlayer();
-        if(event.isCancelled()) return;
+        if(event.isCancelled()) {
+            return;
+        }
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.DropItem);
 
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void Craft(CraftItemEvent event){
+    public void craft(CraftItemEvent event){
         Player player = event.getPlayer();
-        if(event.isCancelled()) return;
+        if(event.isCancelled()) {
+            return;
+        }
         Item item = event.getRecipe().getResult();
         addItem(player,item, TaskFile.TaskType.CraftItem);
     }
 
 
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInt(PlayerInteractEvent event){
         Player player = event.getPlayer();
-        if(event.isCancelled()) return;
+        if(event.isCancelled()) {
+            return;
+        }
         Item item = event.getItem();
         addItem(player,item, TaskFile.TaskType.Click);
 
     }
+
 
 
     @EventHandler
@@ -95,7 +112,7 @@ public class ListerEvents implements Listener{
         Player player = event.getPlayer();
         if(!RSTask.getTask().getPlayerFile(player.getName()).exists()){
             Server.getInstance().broadcastMessage(RSTask.getTask().getLag("join-achievement").replace("%p",player.getName()));
-            RSTask.getTask().getPlayerConfig(player.getName());
+            RSTask.getTask().playerConfig.put(player.getName(),RSTask.getTask().getPlayerConfig(player.getName()));
         }
         if(RSTask.loadSocket){
             new ScoreTask(player).init();
@@ -106,25 +123,30 @@ public class ListerEvents implements Listener{
     public void use(useTaskEvent event){
         Player player = event.getPlayer();
         playerTask task = event.getTaskItem();
-        playerFile file = new playerFile(player.getName());
+        playerFile file = playerFile.getPlayerFile(player.getName());
         Level level = player.getLevel();
         level.addSound(player.getPosition(),Sound.TILE_PISTON_OUT);
         playerTask newTask = file.getTaskByName(task.getTaskName());
-        if(!file.isSuccess(newTask.getTaskName())){
-            String send = RSTask.getTask().getLag("run-task").
-                    replace("%s",task.getTaskName()).replace("%c",RSTask.getTask().
-                    getTaskLoading(task.getTaskName(),player.getName())+"").replace("\\n","\n");
-            RSTask.sendMessage(player,send);
-        }else{
-            if(!RSTask.taskNames.contains(task.getTaskName())){
-                level.addSound(player.getPosition(),Sound.BLOCK_COMPOSTER_READY);
-                String send = RSTask.getTask().getLag("success-message")
-                        .replace("%d",task.getTaskFile()
-                                .getStar()+"").replace("%s",task.getTaskName()).replace("\\n","\n");
+        if(RSTask.showLoading){
+            if(!file.isSuccess(newTask.getTaskName())){
+                String send = RSTask.getTask().getLag("run-task").
+                        replace("%s",task.getTaskName()).replace("%c",RSTask.getTask().
+                        getTaskLoading(task.getTaskName(),player.getName())+"").replace("\\n","\n");
                 RSTask.sendMessage(player,send);
+            }else{
+                if(!RSTask.taskNames.contains(task.getTaskName())){
+                    level.addSound(player.getPosition(),Sound.BLOCK_COMPOSTER_READY);
+                    String send = RSTask.getTask().getLag("success-message")
+                            .replace("%d",task.getTaskFile()
+                                    .getStar()+"").replace("%s",task.getTaskName()).replace("\\n","\n");
+                    RSTask.sendMessage(player,send);
+                }
+                if(RSTask.canSuccess){
+                    playerFile.givePlayerSuccessItems(player,task.getTaskName());
+                }
             }
-
         }
+
     }
 
     @EventHandler
@@ -136,14 +158,14 @@ public class ListerEvents implements Listener{
             Server.getInstance().getLogger().warning("玩家"+player.getName()+"取消"+file.getTaskName()+"任务异常");
             return;
         }
-//        giveUp.remove(player);
         player.sendMessage(RSTask.getTask().getLag("giveUpTaskMessage","§d§l[任务系统]§b 您放弃了 %s 任务")
                 .replace("%s",file.getTaskName()));
-        RSTask.getClickTask.remove(player);
+        RSTask.getTask().getClickTask.remove(player);
+
     }
 
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onReceive(playerClickTaskEvent event){
         Player player = event.getPlayer();
         if(player.getGamemode() == 1) {
@@ -151,21 +173,55 @@ public class ListerEvents implements Listener{
             return;
         }
         TaskFile file = event.getFile();
-        if(file != null){
-            if(TaskFile.runTaskFile(player,file)){
-                RSTask.getClickTask.put(player,file);
-                createMenu.sendTaskMenu(player,file);
+        if(TaskFile.runTaskFile(player,file)) {
+            RSTask.getTask().getClickTask.put(player, file);
+            if(event.isShow()){
+                createMenu.sendTaskMenu(player, file);
             }
         }
+//
+    }
+
+    @EventHandler
+    public void useItem(playerOpenBookEvent event){
+        Player player = event.getPlayer();
+        TaskBook book = event.getBookWritten();
+        TaskFile file = TaskFile.getTask(book.title);
+        if(file != null){
+            if(!playerFile.getPlayerFile(player.getName()).issetTask(file)){
+                playerClickTaskEvent events = new playerClickTaskEvent(file,player);
+                Server.getInstance().getPluginManager().callEvent(events);
+            }
+        }
+        book.upData(file,player);
+        ItemBookWritten written = book.toBook();
+        player.getInventory().removeItem(player.getInventory().getItemInHand());
+        player.getInventory().setItemInHand(written.clone());
     }
 
     @EventHandler
     public void onAddTask(playerAddTaskEvent event){
         Player player = event.getPlayer();
-
         TaskFile file = event.getFile();
-        playerFile file1 = playerFile.getPlayerFile(player.getName());
-        file1.addTask(file);
+        if(player.getGamemode() == 1) {
+            player.sendMessage(RSTask.getTask().getLag("CreateUI","§d§l[任务系统]§c创造模式无法唤醒UI"));
+            return;
+        }
+        if(file != null){
+            playerFile file1 = playerFile.getPlayerFile(player.getName());
+            file1.addTask(file);
+            file1.toSave();
+            if(RSTask.canGiveBook){
+                if(!TaskBook.canInventory(player,file.getTaskName())){
+                    ItemBookWritten written = new ItemBookWritten();
+                    TaskBook book = new TaskBook(written);
+                    book.setTitle(file.getTaskName());
+                    book.writeIn("\n\n\n\n加载中...请再次打开");
+                    ItemBookWritten written1 =  book.toBook();
+                    player.getInventory().addItem(written1.clone());
+                }
+            }
+        }
 
     }
     @EventHandler
@@ -208,16 +264,18 @@ public class ListerEvents implements Listener{
                                     replace("%m",RSTask.getTask().getCoinName()));
                 }
             }
-            if(RSTask.canOpen())
-                if(item.getCount() > 0)
+            if(RSTask.canOpen()) {
+                if(item.getCount() > 0) {
                     success += item.getCount();
+                }
+            }
         }
 
-        playerFile playerFile = new playerFile(player.getName());
-        playerTask task = playerFile.getTaskByName(taskName);
+        playerFile playerFiles = playerFile.getPlayerFile(player.getName());
+        playerTask task = playerFiles.getTaskByName(taskName);
         if(task == null){
-            playerFile.addTask(taskName);
-            task = playerFile.getTaskByName(taskName);
+            playerFiles.addTask(taskName);
+            task = playerFiles.getTaskByName(taskName);
         }
         PlayerTaskClass playerTaskClass = task.getTaskClass();
         TaskItem[] items = playerTaskClass.getValue();
@@ -230,8 +288,9 @@ public class ListerEvents implements Listener{
         playerTaskClass.setTime(new Date());
         task.setTaskClass(playerTaskClass);
         if(RSTask.canOpen()){
-            playerFile.setCount(playerFile.getCount() + success);
+            playerFiles.setCount(playerFiles.getCount() + success);
         }
+
         if(file != null){
             if(file.getType() == TaskFile.TaskType.CollectItem){
                 TaskItem[] items1 = file.getTaskItem();
@@ -244,7 +303,8 @@ public class ListerEvents implements Listener{
                 }
             }
         }
-        playerFile.setPlayerTask(task);
+        playerFiles.setPlayerTask(task);
+        playerFiles.toSave();
     }
 
 
@@ -256,9 +316,7 @@ public class ListerEvents implements Listener{
         Player player = event.getPlayer();
         Level level = player.getLevel();
         level.addSound(player.getPosition(), Sound.RANDOM_LEVELUP);
-        if(RSTask.taskNames.contains(event.getTaskName())){
-            RSTask.taskNames.remove(event.getTaskName());
-        }
+        RSTask.taskNames.remove(event.getTaskName());
         DataTool.spawnFirework(event.getPlayer());
         TaskFile file = TaskFile.getTask(event.getTaskName());
         if(file != null){
@@ -273,12 +331,19 @@ public class ListerEvents implements Listener{
 
     }
 
-
+//    @EventHandler
+//    public void createTask(createTaskEvent event){
+//
+//        new Thread(() -> RSTask.getTask().Tasks = TaskFile.getTasks(true)).start();
+//    }
 
     @EventHandler
     public void onDelTask(delTaskEvent event){
         TaskFile file = event.getTask();
+
+        RSTask.getTask().tasks.remove(file.getTaskName());
         Server.getInstance().getLogger().info("[任务系统] 准备删除"+file.getTaskName()+"任务");
+        RSTask.getTask().taskConfig.remove(event.getTask().getTaskName());
         Server.getInstance().getLogger().info("[任务系统] 开始查找玩家");
         LinkedList<String> players = RSTask.getTask().getPlayerNames();
         Server.getInstance().getLogger().info("[任务系统] 已查找到"+players.size()+"位玩家");
@@ -286,16 +351,17 @@ public class ListerEvents implements Listener{
         for(String playerName:players){
             Player player = Server.getInstance().getPlayer(playerName);
             if(player != null){
-                if(RSTask.getClickTask.containsKey(player)){
-                    RSTask.getClickTask.remove(player);
-                }
+                RSTask.getTask().getClickTask.remove(player);
             }
+
             playerFile file1 = playerFile.getPlayerFile(playerName);
             if(file1.issetTask(file)){
                 i++;
                 if(!file1.delTask(file.getTaskName())){
+                    file1.toSave();
                     Server.getInstance().getLogger().info("[任务系统] 玩家"+playerName+"移除"+file.getTaskName()+"任务失败");
                 }else{
+                    file1.toSave();
                     Server.getInstance().getLogger().info("[任务系统] 玩家"+playerName+"移除"+file.getTaskName()+"任务成功");
                 }
             }
@@ -306,55 +372,62 @@ public class ListerEvents implements Listener{
 
 
 
-    @EventHandler(priority = EventPriority.MONITOR,ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST,ignoreCancelled = true)
     public void onInventoryChange(EntityInventoryChangeEvent event){
         Entity player = event.getEntity();
         if(player instanceof Player){
-            if(event.isCancelled()) return;
-            playerFile file = new playerFile(player.getName());
-            LinkedList<playerTask> getTasks = file.getInviteTasks();
-            if(getTasks == null) return;
-            for(playerTask task:getTasks){
-                if(task.getTaskFile().getType() == TaskFile.TaskType.CollectItem ) {
-                    if(file.isRunning(task.getTaskName()) && task.getTaskClass().getOpen()){
-                        TaskItem[] items = task.getTaskClass().getValue();
-                        for(TaskItem item:items){
-                            ItemClass itemClass = ItemClass.toItem(item);
-                            if(itemClass != null ){
-                                if(event.getNewItem().equals(itemClass.getItem()) || event.getOldItem().equals(itemClass.getItem())){
-                                    int c = CollectItemTask.getCount((Player) player,itemClass);
-                                    if(event.getOldItem().getCount() > event.getNewItem().getCount()){
-                                        c -= (event.getOldItem().getCount()-event.getNewItem().getCount());
-                                    }else{
-                                        c += (event.getNewItem().getCount() - event.getOldItem().getCount());
+            try{
+                playerFile file = playerFile.getPlayerFile(player.getName());
+                LinkedList<playerTask> getTasks = file.getInviteTasks();
+                if(getTasks == null) {
+                    return;
+                }
+                Thread thread = new Thread(()->{
+                    for(playerTask task:getTasks){
+                        if(task.getTaskFile().getType() == TaskFile.TaskType.CollectItem) {
+                            if(file.isRunning(task.getTaskName()) && task.getTaskClass().getOpen()){
+                                TaskItem[] items = task.getTaskClass().getValue();
+                                for(TaskItem item:items){
+                                    ItemClass itemClass = ItemClass.toItem(item);
+                                    if(itemClass != null ){
+                                        if(event.getNewItem().equals(itemClass.getItem()) || event.getOldItem().equals(itemClass.getItem())){
+                                            int c = CollectItemTask.getCount((Player) player,itemClass);
+                                            if(c < 0) {
+                                                c = 0;
+                                            }
+                                            if(c != item.getEndCount()){
+                                                if(file.setTaskValue(task.getTaskName(),item.getTask(),c)){
+                                                    file.toSave();
+                                                    useTaskEvent event1 = new useTaskEvent((Player) player,task);
+                                                    Server.getInstance().getPluginManager().callEvent(event1);
+                                                }
+                                            }
+                                        }
                                     }
-                                    if(file.setTaskValue(task.getTaskName(),item.getTask(),c)){
-                                        useTaskEvent event1 = new useTaskEvent((Player) player,task);
-                                        Server.getInstance().getPluginManager().callEvent(event1);
-                                    }
-//                                    defaultUseTask(player.getName(),item.getTask(), TaskFile.TaskType.CollectItem,c,false,false);
-                                }else if(CollectItemTask.getCount((Player) player,itemClass) != item.getEndCount()){
-                                    itemClass = ItemClass.toItem(item);
-                                    int c = CollectItemTask.getCount((Player) player,itemClass);
-                                    if(file.setTaskValue(task.getTaskName(),item.getTask(),c)){
-                                        useTaskEvent event1 = new useTaskEvent((Player) player,task);
-                                        Server.getInstance().getPluginManager().callEvent(event1);
-                                    }
-//                                    defaultUseTask(player.getName(),item.getTask(), TaskFile.TaskType.CollectItem,c,false,false);
                                 }
                             }
                         }
-                    }
-                }
-                if(!event.isCancelled()){
-                    if(task.getTaskFile().getType() == TaskFile.TaskType.GetItem){
-                        Item item = event.getNewItem();
-                        addItem((Player) player,item, TaskFile.TaskType.GetItem);
-                    }
-                }
+                        if(!event.isCancelled()){
+                            if(task.getTaskFile().getType() == TaskFile.TaskType.GetItem){
+                                Item item = event.getNewItem();
+                                addItem((Player) player,item, TaskFile.TaskType.GetItem);
+                            }
+                        }
 
-            }
+                    }
+                });
+                thread.start();
+            }catch(NullPointerException ignore){}
+
         }
+    }
+    @EventHandler
+    public void pickBlock(PlayerBlockPickEvent event){
+        Item item = event.getItem();
+        if(event.isCancelled()) {
+            return;
+        }
+        addItem(event.getPlayer(),item,TaskFile.TaskType.CollectItem);
     }
 
 
@@ -372,7 +445,7 @@ public class ListerEvents implements Listener{
 
     public static void defaultUseTask(String player, String item, TaskFile.TaskType type,int add, boolean echo,boolean canAdd){
 
-        playerFile file = new playerFile(player);
+        playerFile file = playerFile.getPlayerFile(player);
         LinkedList<playerTask> getTasks = file.getInviteTasks();
         for(playerTask task:getTasks){
             if(!task.getTaskClass().issetTaskItem(item)){
@@ -387,6 +460,7 @@ public class ListerEvents implements Listener{
                                 return;
                             }
                         }else{
+                            file.toSave();
                             Player player1 = Server.getInstance().getPlayer(player);
                             if(player1 != null){
                                 useTask(player1,task);
@@ -394,6 +468,7 @@ public class ListerEvents implements Listener{
                         }
                     }else{
                         if(file.setTaskValue(task.getTaskName(),item,add)){
+                            file.toSave();
                             Player player1 = Server.getInstance().getPlayer(player);
                             if(player1 != null){
                                 useTask(player1,task);
@@ -403,6 +478,7 @@ public class ListerEvents implements Listener{
                 }
             }
         }
+
     }
 
     private static void useTask(Player player,playerTask task){

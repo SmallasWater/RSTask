@@ -1,12 +1,13 @@
 package com.Task.utils.events;
 
 
+import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.HandlerList;
 import com.Task.utils.Tasks.TaskFile;
 
 /** 删除任务事件*/
-public class delTaskEvent extends Event {
+public class delTaskEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     public static HandlerList getHandlers() {

@@ -6,20 +6,23 @@ import cn.nukkit.Server;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 
-import cn.nukkit.event.EventHandler;
 import cn.nukkit.item.Item;
+import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.level.Level;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
-import com.Task.utils.Scorebroad.ScoreTask;
+import com.Task.commands.runTaskCommand;
+import com.Task.utils.Task.CollectItemTask;
 import com.Task.utils.Task.ListerEvents;
 import com.Task.utils.Tasks.TaskFile;
 import com.Task.utils.Tasks.TaskItems.ItemClass;
+import com.Task.utils.Tasks.TaskItems.TaskBook;
 import com.Task.utils.Tasks.TaskItems.TaskItem;
 import com.Task.utils.Tasks.playerFile;
 import com.Task.utils.events.createTaskEvent;
 import com.Task.utils.events.delTaskEvent;
 import com.Task.utils.events.playerClickTaskEvent;
+import com.Task.utils.events.playerOpenBookEvent;
 import com.Task.utils.form.ListenerMenu;
 import com.Task.utils.form.createMenu;
 import org.jline.utils.Log;
@@ -31,81 +34,87 @@ import java.util.*;
 
 public class RSTask extends PluginBase{
     private static RSTask task;
+
     public static LinkedList<String> taskNames = new LinkedList<>();
+
     public static LinkedHashMap<Player,Integer> getClickStar = new LinkedHashMap<>();
-    public static LinkedHashMap<Player,TaskFile> getClickTask = new LinkedHashMap<>();
-    public static boolean loadSocket = false;
+
+    public LinkedHashMap<Player,TaskFile> getClickTask = new LinkedHashMap<>();
+
+    public LinkedHashMap<String,TaskFile> tasks = new LinkedHashMap<>();
+
+    public LinkedHashMap<String,playerFile> playerFiles = new LinkedHashMap<>();
+
+    public static boolean loadSocket = true;
+
     public static boolean loadEconomyAPI = false;
 
+    public static boolean countChecking = true;
 
-    private String[] Default_First_Name = new String[]{
+    public static boolean showCount = true;
+
+    public static boolean showLoading = true;
+
+    public static boolean showBack = true;
+
+    public static boolean runC = true;
+
+    public static boolean canGiveBook = true;
+
+    public static boolean canSuccess = false;
+
+    public LinkedList<Player> bookOpen = new LinkedList<>();
+
+    public LinkedHashMap<String,Config> playerConfig = new LinkedHashMap<>();
+
+    public LinkedHashMap<String,Config> taskConfig = new LinkedHashMap<>();
+
+    private Config lag;
+
+
+
+    private String[] defaultFirstName = new String[]{
             "a","b","c","d","e","f","g","h",
             "i","j","k", "l","m","n","o","p","q",
             "r","s","t","u","v","w","x","y","z","0","1","2",
             "3","4","5","6","7","8","9","#"
     };
+
     @Override
     public void onEnable() {
         task = this;
         this.getLogger().info("[RSTask] 启动任务系统插件");
-        File taskFiles = new File(this.getDataFolder()+"/Tasks");
-        if(!taskFiles.exists())
-            if(!taskFiles.mkdirs())
-                Log.error("创建Tasks文件夹失败");
-
-
-        for(String i: Default_First_Name){
-            File file = new File(this.getDataFolder()+"/Players/"+i);
-            if(!file.exists()){
-                if(!file.mkdirs())
-                    Log.error("玩家文件初始化失败");
-            }
-        }
-
-
-        if(!new File(this.getDataFolder()+"/config").exists()){
-            this.saveDefaultConfig();
-            this.reloadConfig();
-        }
-        if(!new File(this.getDataFolder()+"/language.properties").exists()){
-            this.saveResource("language.properties",false);
-        }
         this.getServer().getPluginManager().registerEvents(new ListenerMenu(),this);
         this.getServer().getPluginManager().registerEvents(new ListerEvents(),this);
-        if(canUseEconomyAPI()){
-            if(Server.getInstance().getPluginManager().getPlugin("EconomyAPI") != null){
-                loadEconomyAPI = true;
-            }else{
-                Server.getInstance().getLogger().warning("未检测到EconomyAPI");
-            }
-        }
-        if(canUseScore()){
-            for(int i = 1;i <= 5;i++){
-                if(Server.getInstance().getPluginManager().getPlugin("ScoreboardAPI") != null){
-                    loadSocket = true;
-                    break;
-                }else{
-                    Server.getInstance().getLogger().warning("未检测到ScoreboardAPI");
-                    Server.getInstance().getLogger().warning("尝试"+i+"次重载");
-                    Server.getInstance().getPluginManager().loadPlugin(this.getServer().getFilePath()+"/plugins/ScoreboardAPI.jar");
-                }
-            }
-            if(Server.getInstance().getPluginManager().getPlugin("ScoreboardAPI") == null){
-                Server.getInstance().getLogger().warning("ScoreboardAPI加载失败");
-            }
+        this.getServer().getCommandMap().register("superTask",new runTaskCommand("rtc"));
+        loadTask();
 
+    }
+
+    private void init(){
+        countChecking = getConfig().getBoolean("是否开启积分验证");
+
+        showCount = getConfig().getBoolean("主页面是否显示数量",true);
+
+        showLoading = getConfig().getBoolean("是否在底部显示任务进度");
+
+        showBack = getConfig().getBoolean("是否增加任务界面返回按钮");
+
+        runC = getConfig().getBoolean("是否允许玩家执行c指令",true);
+
+        canGiveBook = getConfig().getBoolean("领取任务是否给予任务书",true);
+
+        canSuccess = getConfig().getBoolean("完成任务是否直接领取奖励",true);
+        for(String playerName:getPlayerNames()){
+            playerFiles.put(playerName,playerFile.getPlayerFile(playerName));
         }
     }
+
 
     public static RSTask getTask() {
         return task;
     }
 
-    @Override
-    public Config getConfig() {
-        this.reloadConfig();
-        return super.getConfig();
-    }
 
     /** 判断编号是否存在*/
     public boolean canExistsNumber(String number){
@@ -133,8 +142,10 @@ public class RSTask extends PluginBase{
         LinkedHashMap<String,Object> map = (LinkedHashMap<String, Object>) config.getAll();
         for(String string:map.keySet()){
             String c = (String) map.get(string);
-            if(ItemClass.toItem(c).equals(itemClass))
-                return true;
+            ItemClass itemClass1 = ItemClass.toItem(c);
+            if(itemClass1 != null){
+                return itemClass1.equals(itemClass);
+            }
         }
         return false;
     }
@@ -146,8 +157,9 @@ public class RSTask extends PluginBase{
         LinkedHashMap<String,Object> map = (LinkedHashMap<String, Object>) config.getAll();
         for(String string:map.keySet()){
             String c = (String) map.get(string);
-            if(c.equals(itemClass.toString()))
+            if(c.equals(itemClass.toString())) {
                 return string;
+            }
         }
         if(config.get(id+"") == null){
             s = id;
@@ -217,14 +229,12 @@ public class RSTask extends PluginBase{
     }
 
     public String getLag(String value){
-        Config config = new Config(this.getDataFolder()+"/language.properties",Config.PROPERTIES);
-        return config.getString(value);
+        return lag.getString(value);
     }
 
 
     public String getLag(String value,String defaultString){
-        Config config = new Config(this.getDataFolder()+"/language.properties",Config.PROPERTIES);
-        return config.getString(value,defaultString);
+        return lag.getString(value,defaultString);
     }
 
     /** 获取金币名称*/
@@ -239,7 +249,7 @@ public class RSTask extends PluginBase{
 
     /** 获取积分名称*/
     public boolean canShowLodding(){
-        return getConfig().getBoolean("主页面是否显示数量",true);
+        return showCount;
     }
 
 
@@ -270,11 +280,12 @@ public class RSTask extends PluginBase{
                     this.getLogger().info("Worlds/"+level.getFolderName()+"文件夹创建失败");
                 }
             }
-            for(String i: Default_First_Name){
+            for(String i: defaultFirstName){
                 File file = new File(this.getDataFolder()+"/Worlds/"+level.getFolderName()+"/Players/"+i);
                 if(!file.exists()){
-                    if(!file.mkdirs())
+                    if(!file.mkdirs()) {
                         Log.error("玩家文件初始化失败");
+                    }
                 }
             }
             this.getLogger().info("Worlds/"+level.getFolderName()+"/Players/文件夹创建成功");
@@ -284,6 +295,9 @@ public class RSTask extends PluginBase{
 
     public Config getTaskConfig(String taskName){
         if(TaskFile.isFileTask(taskName)){
+            if(taskConfig.containsKey(taskName)) {
+                return taskConfig.get(taskName);
+            }
             return new Config(this.getDataFolder()+"/Tasks/"+taskName+".yml",Config.YAML);
         }
         return null;
@@ -294,7 +308,10 @@ public class RSTask extends PluginBase{
         if(!getPlayerFile(playerName).exists()){
             saveResource("player",getPlayerFileName(playerName),false);
         }
-        return new Config(this.getDataFolder()+getPlayerFileName(playerName));
+        if(!playerConfig.containsKey(playerName)){
+            playerConfig.put(playerName,new Config(this.getDataFolder()+getPlayerFileName(playerName)));
+        }
+        return playerConfig.get(playerName);
     }
 
     public File getPlayerFile(String playerName){
@@ -302,8 +319,8 @@ public class RSTask extends PluginBase{
     }
 
 
-    private String getPlayerFileName(String player){
-        for(String i: Default_First_Name)
+    public String getPlayerFileName(String player){
+        for(String i: defaultFirstName)
         {
             if(i.equals(player.substring(0,1).toLowerCase())){
                 return "/Players/"+i+"/"+player+".yml";
@@ -313,7 +330,7 @@ public class RSTask extends PluginBase{
     }
 
     public boolean canUseScore() {
-        return getConfig().getBoolean("是否使用计分板",false);
+        return getConfig().getBoolean("是否使用计分板",true);
     }
 
 
@@ -321,13 +338,13 @@ public class RSTask extends PluginBase{
      * 获取任务小数进度 百分比
      */
     public double getTaskLoading(String taskName,String player){
-        playerFile playerFile = new playerFile(player);
+        playerFile playerFiles = playerFile.getPlayerFile(player);
         TaskFile file = TaskFile.getTask(taskName);
         if(file != null){
-            if(playerFile.issetTask(file.getTaskName())){
-                double count = playerFile.getTaskItems(file.getTaskName()).length;
+            if(playerFiles.issetTask(file.getTaskName())){
+                double count = playerFiles.getTaskItems(file.getTaskName()).length;
                 double math = 0.0D;
-                for(TaskItem item:playerFile.getTaskItems(file.getTaskName())){
+                for(TaskItem item:playerFiles.getTaskItems(file.getTaskName())){
                     if(item != null){
                         double fileCount = file.getCountByTaskItem(item);
                         double playerCount = item.getEndCount();
@@ -336,8 +353,9 @@ public class RSTask extends PluginBase{
                                 playerCount = fileCount;
                             }
                             double con =  playerCount / fileCount;
-                            if(con != 0)
+                            if(con != 0) {
                                 math += ((con /  count) * 100);
+                            }
                         }
                     }
                 }
@@ -349,7 +367,7 @@ public class RSTask extends PluginBase{
     }
     /** 是否开启积分限制 */
     public static boolean canOpen(){
-        return RSTask.getTask().getConfig().getBoolean("是否开启积分验证");
+        return countChecking;
     }
 
     public static boolean canUseEconomyAPI(){
@@ -359,7 +377,7 @@ public class RSTask extends PluginBase{
 
     /** 是否显示返回按钮 */
     public static boolean canBack(){
-        return RSTask.getTask().getConfig().getBoolean("是否增加任务界面返回按钮");
+        return showBack;
     }
 
     /**获取难度需要积分 */
@@ -409,7 +427,7 @@ public class RSTask extends PluginBase{
 
 
     public boolean canRunC(){
-        return getConfig().getBoolean("是否允许玩家执行c指令",true);
+        return runC;
     }
 
 
@@ -430,6 +448,57 @@ public class RSTask extends PluginBase{
                 }
 
             }
+        }
+        if (command.getName().equals("cbook")) {
+            if(sender instanceof Player){
+                if(args.length > 0){
+                    if(args[0].equals("help")){
+                        sender.sendMessage("§c=======================");
+                        sender.sendMessage("§e/cbook <任务名称> 获得该任务的任务书");
+                        sender.sendMessage("§e/cbook up 更新手中的任务书");
+                        sender.sendMessage("§c=======================");
+                        return true;
+                    }
+                    if(args[0].equals("up")){
+                        Item item = ((Player) sender).getInventory().getItemInHand();
+                        if(item instanceof ItemBookWritten){
+                            if(TaskBook.isBook((ItemBookWritten) item)){
+                                CollectItemTask.onRun((Player) sender);
+                                playerOpenBookEvent event = new playerOpenBookEvent(
+                                        (Player) sender,TaskBook.getTaskBookByItem(((ItemBookWritten) item)));
+                                Server.getInstance().getPluginManager().callEvent(event);
+                                sender.sendMessage("§a==============");
+                                sender.sendMessage("§e任务书更新成功");
+                                sender.sendMessage("§a==============");
+                                return true;
+                            }
+                        }
+                        sender.sendMessage("§c请手持任务书");
+                        return true;
+                    }
+                    String taskName = args[0];
+                    TaskFile file = TaskFile.getTask(taskName);
+                    if(file == null){
+                        sender.sendMessage("§c不存在"+args[0]+"任务");
+                        return true;
+                    }
+                    playerFile file1 = playerFile.getPlayerFile(sender.getName());
+                    if(file1.canInvite(file.getTaskName())){
+                        ItemBookWritten written = new ItemBookWritten();
+                        TaskBook book = new TaskBook(written);
+
+                        book.setTitle(file.getTaskName());
+                        book.writeIn("\n\n\n\n加载中...请再次打开");
+                        ((Player) sender).getInventory().setItemInHand(book.toBook().clone());
+                    }else{
+                        sender.sendMessage("§c"+args[0]+"任务不可领取");
+                        return true;
+                    }
+
+                }
+            }
+
+
         }
         if(command.getName().equals("sh")){
             if(args.length > 0){
@@ -491,8 +560,79 @@ public class RSTask extends PluginBase{
                 return false;
             }
         }
+        if(command.getName().equals("reload-task")) {
+            loadTask();
+            sender.sendMessage("§e任务重新读取");
 
 
+        }
         return true;
     }
+
+    private void loadTask() {
+        taskConfig = new LinkedHashMap<>();
+        File taskFiles = new File(this.getDataFolder()+"/Tasks");
+        if(!taskFiles.exists()) {
+            if(!taskFiles.mkdirs()) {
+                Log.error("创建Tasks文件夹失败");
+            }
+        }
+        File fileE = new File(RSTask.getTask().getDataFolder()+"/Tasks");
+        File[] files = fileE.listFiles();
+        if(files != null){
+            Arrays.sort(files);
+            for(File file1:files){
+                if(file1.isFile()){
+                    String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
+                    taskConfig.put(names,new Config(this.getDataFolder()+"/Tasks/"+names+".yml",Config.YAML));
+                }
+            }
+        }
+        tasks = TaskFile.getTasks();
+        for(String i: defaultFirstName){
+            File file = new File(this.getDataFolder()+"/Players/"+i);
+            if(!file.exists()){
+                if(!file.mkdirs()) {
+                    Log.error("玩家文件初始化失败");
+                }
+            }
+        }
+        playerConfig = new LinkedHashMap<>();
+        for(String playerName:getPlayerNames()){
+            playerConfig.put(playerName,new Config(getDataFolder()+getPlayerFileName(playerName)));
+
+        }
+        if(!new File(this.getDataFolder()+"/config").exists()){
+            this.saveDefaultConfig();
+            this.reloadConfig();
+        }
+        if(!new File(this.getDataFolder()+"/language.properties").exists()){
+            this.saveResource("language.properties",false);
+        }
+        lag = new Config(this.getDataFolder()+"/language.properties",Config.PROPERTIES);
+        if(canUseEconomyAPI()){
+            if(Server.getInstance().getPluginManager().getPlugin("EconomyAPI") != null){
+                loadEconomyAPI = true;
+            }else{
+                Server.getInstance().getLogger().warning("未检测到EconomyAPI");
+            }
+        }
+        if(canUseScore()){
+            for(int i = 1;i <= 5;i++){
+                if(Server.getInstance().getPluginManager().getPlugin("ScoreboardAPI") != null){
+                    loadSocket = true;
+                    break;
+                }else{
+                    Server.getInstance().getLogger().warning("未检测到ScoreboardAPI");
+                    Server.getInstance().getLogger().warning("尝试"+i+"次重载");
+                    Server.getInstance().getPluginManager().loadPlugin(this.getServer().getFilePath()+"/plugins/ScoreboardAPI.jar");
+                }
+            }
+            if(Server.getInstance().getPluginManager().getPlugin("ScoreboardAPI") == null){
+                Server.getInstance().getLogger().warning("ScoreboardAPI加载失败");
+            }
+        }
+        init();
+    }
+
 }

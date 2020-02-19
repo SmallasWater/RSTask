@@ -1,7 +1,6 @@
 package com.Task.utils.Tasks.TaskItems;
 
 
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.Task.RSTask;
@@ -147,6 +146,7 @@ public class ItemClass {
         return item;
     }
 
+    @Override
     public String toString(){
         return item.getId()+":"+item.getDamage()+":"+item.getCount()+":"
                 +((item.hasCompoundTag())?bytesToHexString(item.getCompoundTag()):"not");
@@ -176,17 +176,20 @@ public class ItemClass {
 
 
 
-    public boolean equals(ItemClass itemClass){
-        if(item.hasCompoundTag() || itemClass.getItem().hasCompoundTag()) {
+    public boolean equals(ItemClass itemClass) {
+        if (item.hasCompoundTag() || itemClass.getItem().hasCompoundTag()) {
             Item item1 = itemClass.getItem();
-            item1.setCount(item.getCount());
-            String v1 = ItemClass.bytesToHexString(item.getCompoundTag());
-            String v2 = ItemClass.bytesToHexString(item1.getCompoundTag());
-            if(v1 != null && v2 != null){
-                return  v1.equals(v2);
+            CompoundTag tag1 = item1.getNamedTag();
+            CompoundTag tag2 = item.getNamedTag();
+            if(item != null){
+                if(tag1 != null && tag2 != null){
+                    if(tag1.equals(tag2)){
+                        return item1.getId() == item.getId() && item1.getDamage() == item.getDamage();
+                    }
+                }
             }
-        }else{
-            return (item.getId()+":"+item.getDamage()).equals(itemClass.item.getId()+":"+itemClass.item.getDamage());
+        } else {
+            return (item.getId() + ":" + item.getDamage()).equals(itemClass.item.getId() + ":" + itemClass.item.getDamage());
         }
         return false;
     }

@@ -8,13 +8,10 @@ import cn.nukkit.Server;
 import cn.nukkit.utils.Config;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
-import com.Task.utils.Task.CollectItemTask;
 import com.Task.utils.Tasks.TaskItems.*;
 import com.Task.utils.events.playerAddTaskEvent;
-import javafx.concurrent.Task;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -50,7 +47,7 @@ public class TaskFile {
     private TaskType type;
 
     /** 上一个任务 */
-    private String task = null;
+    private String task;
 
     /** 刷新时间 */
     private int day = 0;
@@ -169,14 +166,16 @@ public class TaskFile {
     }
 
     public void toSaveConfig(){
-        if(TaskName == null) return;
+        if(TaskName == null) {
+            return;
+        }
         if(!isFileTask(TaskName)){
             RSTask.getTask().saveResource("Task.yml","/Tasks/"+TaskName+".yml",false);
         }
-        LinkedHashMap<String,Object> TaskItems = new LinkedHashMap<>();
+        LinkedHashMap<String,Object> taskitems = new LinkedHashMap<>();
         if(taskItem != null){
             for(TaskItem taskItem:taskItem){
-                TaskItems.putAll(taskItem.toSaveConfig());
+                taskitems.putAll(taskItem.toSaveConfig());
             }
         }
         Config config = RSTask.getTask().getTaskConfig(TaskName);
@@ -185,19 +184,21 @@ public class TaskFile {
         config.set("任务介绍",TaskMessage == null ? "无":TaskMessage);
         config.set("刷新时间(天)",day);
         config.set("任务类型",type.getTaskType());
-        if(task != null && !task.equals("null"))
+        if(task != null && !task.equals("null")) {
             config.set("完成此任务前需完成",task);
-        config.set("任务内容",TaskItems);
-        if(fristSuccessItem != null)
+        }
+        config.set("任务内容",taskitems);
+        if(fristSuccessItem != null){
             config.set("首次完成奖励",fristSuccessItem.toSaveConfig());
-            else
+        } else {
             config.set("首次完成奖励",successItem.toSaveConfig());
-
+        }
         config.set("奖励",successItem.toSaveConfig());
         config.set("完成公告类型(0/1)",MessageType);
         config.set("公告内容",broadcastMessage);
         config.set("自定义按键图片",button.toSaveConfig());
         config.save();
+        RSTask.getTask().taskConfig.put(TaskName,config);
     }
 
     public void setDay(int day) {
@@ -237,7 +238,7 @@ public class TaskFile {
         this.taskItem = taskItem;
     }
 
-    public void setTask(String task) {
+    public void setLastTask(String task) {
         this.task = task;
     }
 
@@ -284,8 +285,9 @@ public class TaskFile {
 
     public boolean canInArrayTaskItem(TaskItem item){
         for(TaskItem item1:taskItem){
-            if(item1.equals(item))
+            if(item1.equals(item)) {
                 return true;
+            }
         }
         return false;
     }
@@ -293,10 +295,6 @@ public class TaskFile {
 
     public int getMessageType() {
         return MessageType;
-    }
-
-    public String getTask() {
-        return task;
     }
 
     public String getBroadcastMessage() {
@@ -309,7 +307,10 @@ public class TaskFile {
     }
 
     public static TaskFile getTask(String taskName){
+        return RSTask.getTask().tasks.get(taskName);
+    }
 
+    private static TaskFile toTask(String taskName){
         try{
             if(isFileTask(taskName)){
                 Config config = RSTask.getTask().getTaskConfig(taskName);
@@ -326,10 +327,10 @@ public class TaskFile {
                 if(map != null){
                     taskItems = new TaskItem[map.size()];
                     int i = 0;
-                    for(Object Os:map.keySet()){
-                        if(Os instanceof String){
+                    for(Object os :map.keySet()){
+                        if(os  instanceof String){
                             taskItems[i] = TaskItem.toTaskItem(taskName,new LinkedHashMap<String,Integer>() {{
-                                put((String) Os,Integer.parseInt(String.valueOf( map.get(Os))));}});
+                                put((String) os ,Integer.parseInt(String.valueOf( map.get(os ))));}});
                             i++;
                         }
                     }
@@ -339,15 +340,14 @@ public class TaskFile {
                 Map firstSuccess = (Map) config.get("首次完成奖励");
                 successItem first =
                         com.Task.utils.Tasks.TaskItems.successItem.toSuccessItem(firstSuccess);
-                Map Success = (Map) config.get("奖励");
-                com.Task.utils.Tasks.TaskItems.successItem success =
-                        com.Task.utils.Tasks.TaskItems.successItem.toSuccessItem(Success);
-
-                if(type == null) return null;
-
-
+                Map success = (Map) config.get("奖励");
+                successItem second =
+                        com.Task.utils.Tasks.TaskItems.successItem.toSuccessItem(success);
+                if(type == null) {
+                    return null;
+                }
                 return new TaskFile(taskName,type,taskItems,config.getString("任务介绍")
-                        ,config.getInt("任务难度"),success,first,config.getString("完成此任务前需完成"),
+                        ,config.getInt("任务难度"),second,first,config.getString("完成此任务前需完成"),
                         +config.getInt("刷新时间(天)"),config.getInt("完成公告类型(0/1)"),config.getString("公告内容"),TaskButton.toTaskButton((Map) config.get("自定义按键图片")));
 
             }
@@ -367,13 +367,10 @@ public class TaskFile {
         return null;
     }
 
-
     public boolean close(){
         if(isFileTask(this.TaskName)){
             File file = new File(RSTask.getTask().getDataFolder()+"/Tasks/"+TaskName+".yml");
-            if(!file.delete()){
-                return false;
-            }
+            return file.delete();
         }
         return true;
     }
@@ -382,69 +379,82 @@ public class TaskFile {
     /** 根据TaskItem 获取count */
     public int getCountByTaskItem(TaskItem item){
         for(TaskItem item1:taskItem){
-            if(item1.equals(item))
+            if(item1.equals(item)) {
                 return item1.getEndCount();
+            }
         }
         return 0;
     }
 
     /** 获取所有任务文件 */
-    public static LinkedList<TaskFile> getTasks(){
+
+    public static LinkedHashMap<String,TaskFile> getTasks(){
         File file = new File(RSTask.getTask().getDataFolder()+"/Tasks");
-        LinkedList<TaskFile> names_ = new LinkedList<>();
+        LinkedHashMap<String,TaskFile> names = new LinkedHashMap<>();
         File[] files = file.listFiles();
         if(files != null){
             Arrays.sort(files);
             for(File file1:files){
                 if(file1.isFile()){
-                    String names = file1.getName().substring(0,file1.getName().lastIndexOf("."));
-                    TaskFile file2 = TaskFile.getTask(names);
-                    if(file2 != null)
-                        names_.add(file2);
+                    String name = file1.getName().substring(0,file1.getName().lastIndexOf("."));
+                    TaskFile file2 = TaskFile.toTask(name);
+                    if(file2 != null) {
+                        names.put(name,file2);
+                    }
                 }
             }
         }
-        return names_;
+        return names;
+
+
     }
 
     /** 获取同一级别难度的任务 */
     public static LinkedList<TaskFile> getDifficultyTasks(int star){
         LinkedList<TaskFile> files = new LinkedList<>();
-        for (TaskFile file:getTasks()){
-            if(file.getStar() == star)
+        for (TaskFile file:RSTask.getTask().tasks.values()){
+            if(file.getStar() == star) {
                 files.add(file);
+            }
         }
         return files;
     }
 
     public static boolean runTaskFile(Player player,TaskFile file){
-
         playerFile file1 = playerFile.getPlayerFile(player.getName());
-        if(file1.can_Invite(file.getTaskName())){
+        playerFile.PlayerTaskType type = file1.getTaskType(file);
+        if(type == playerFile.PlayerTaskType.can_Invite || type == playerFile.PlayerTaskType.isSuccess_canInvite){
             playerAddTaskEvent event1= new playerAddTaskEvent(player,file);
             Server.getInstance().getPluginManager().callEvent(event1);
-        }else if(!file1.isRunning(file.getTaskName())){
-            if(file1.issetTask(file)){
-                if(file1.isSuccessed(file.getTaskName()) && file.getSuccessItem().getCount() == 0){
-                    player.sendMessage(RSTask.getTask().getLag("repeat-collection"));
-                    return false;
-                }else if(!file1.inDay(file.getTaskName())){
-                    int day = file.getDay();
-                    int out = DataTool.getTime(file1.getTaskByName(file.getTaskName()).getTaskClass().getTime());
-                    player.sendMessage(RSTask.getTask().getLag("repeat-inDay").
-                            replace("%c",((day > out)?(day - out):0)+""));
-                    return false;
-                }
-            }else{
+            return true;
+        }
+        if(type == playerFile.PlayerTaskType.Running){
+            return true;
+        }
+        if((file.getLastTask() != null && !file.getLastTask().equals("null") && !file.getLastTask().equals(""))){
+            if(!file1.issetTask(file.getLastTask())){
                 player.sendMessage(RSTask.getTask().getLag("useLastTask").replace("%s",file.getLastTask()));
                 return false;
             }
         }
-        if(file.getType() == TaskFile.TaskType.CollectItem){
-            CollectItemTask.onRun(player);
+        if(file1.isSuccessed(file.getTaskName()) && file.getSuccessItem().getCount() == 0){
+            player.sendMessage(RSTask.getTask().getLag("repeat-collection"));
+            return false;
         }
+        if(!file1.inDay(file.getTaskName())){
+            int day = file.getDay();
+            int out = DataTool.getTime(file1.getTaskByName(file.getTaskName()).getTaskClass().getTime());
+            player.sendMessage(RSTask.getTask().getLag("repeat-inDay").
+                    replace("%c",((day > out)?(day - out):0)+""));
+            return false;
+        }
+
+
+
         return true;
     }
+
+
 
 
 }

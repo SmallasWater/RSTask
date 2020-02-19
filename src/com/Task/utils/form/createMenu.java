@@ -9,15 +9,12 @@ import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import com.Task.RSTask;
 import com.Task.utils.ItemIDSunName;
+import com.Task.utils.Task.CollectItemTask;
 import com.Task.utils.Tasks.TaskFile;
-import com.Task.utils.Tasks.TaskItems.CommandClass;
-import com.Task.utils.Tasks.TaskItems.ItemClass;
-import com.Task.utils.Tasks.TaskItems.TaskItem;
-import com.Task.utils.Tasks.TaskItems.successItem;
+import com.Task.utils.Tasks.TaskItems.*;
 import com.Task.utils.Tasks.playerFile;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class createMenu {
@@ -32,11 +29,11 @@ public class createMenu {
 
 
     public static void sendMenu(Player player){
-        playerFile playerFile = new playerFile(player.getName());
+        playerFile playerFiles = playerFile.getPlayerFile(player.getName());
         FormWindowSimple simple =
                 new FormWindowSimple
                         (task.getLag("title"),(RSTask.canOpen())?
-                                (task.getLag("player-task-integral").replace("%c",playerFile.getCount()+"").replace("%f",RSTask.getTask().getFName()))
+                                (task.getLag("player-task-integral").replace("%c",playerFiles.getCount()+"").replace("%f",RSTask.getTask().getFName()))
                                 : "");
         int i = 1;
         Map map = ((Map)task.getConfig().get("自定义图片路径"));
@@ -44,16 +41,16 @@ public class createMenu {
             if(o instanceof String){
                 String s = " ";
                 if(RSTask.canOpen()){
-                    if(playerFile.canLock(i)){
+                    if(playerFiles.canLock(i)){
                         if(RSTask.getTask().canShowLodding()){
-                            if(playerFile.getCanInviteTasks(i).size() == 0 && playerFile.getInviteTasks(i).size() == 0 && playerFile.getSuccessTasks(i).size() == 0){
+                            if(playerFiles.getCanInviteTasks(i).size() == 0 && playerFiles.getInviteTasks(i).size() == 0 && playerFiles.getSuccessTasks(i).size() == 0){
                                 s = (RSTask.getTask().getLag("success-all"));
-                            }else if(playerFile.getSuccessTasks(i).size() > 0){
-                                s = (RSTask.getTask().getLag("task-message-success").replace("%c",playerFile.getSuccessTasks(i).size()+""));
-                            }else if(playerFile.getInviteTasks(i).size() > 0){
-                                s = (RSTask.getTask().getLag("task-message-lodding").replace("%c",playerFile.getInviteTasks(i).size()+""));
-                            }else if(playerFile.getCanInviteTasks(i).size() > 0){
-                                s = (RSTask.getTask().getLag("task-message-can-receive").replace("%c",playerFile.getCanInviteTasks(i).size()+""));
+                            }else if(playerFiles.getSuccessTasks(i).size() > 0){
+                                s = (RSTask.getTask().getLag("task-message-success").replace("%c",playerFiles.getSuccessTasks(i).size()+""));
+                            }else if(playerFiles.getInviteTasks(i).size() > 0){
+                                s = (RSTask.getTask().getLag("task-message-lodding").replace("%c",playerFiles.getInviteTasks(i).size()+""));
+                            }else if(playerFiles.getCanInviteTasks(i).size() > 0){
+                                s = (RSTask.getTask().getLag("task-message-can-receive").replace("%c",playerFiles.getCanInviteTasks(i).size()+""));
                             }
                         }
                     }else{
@@ -74,16 +71,14 @@ public class createMenu {
     static void sendTaskList(Player player,int star){
         LinkedList<TaskFile> taskFiles = TaskFile.getDifficultyTasks(star);
 
-        playerFile playerFile = new playerFile(player.getName());
+        playerFile playerFiles = playerFile.getPlayerFile(player.getName());
         FormWindowSimple simple = new FormWindowSimple(task.getLag("title"),
                 RSTask.getTask().getLag("sendMenu-content"));
 
         for(TaskFile file:taskFiles) {
             if(file != null){
                 String s = "";
-//            if(playerFile.getTaskType(file) == )
-
-                switch (playerFile.getTaskType(file)) {
+                switch (playerFiles.getTaskType(file)) {
                     case Running:
                         s = (RSTask.getTask().getLag("using"));
                         break;
@@ -102,6 +97,8 @@ public class createMenu {
                     case isSuccess_noInvite:
                         s = (RSTask.getTask().getLag("cannot-receive"));
                         break;
+                        default:
+                            break;
                 }
                 ElementButton button = file.getButton().toButton();
                 button.setText(file.getTaskName() + s);
@@ -115,8 +112,8 @@ public class createMenu {
     }
 
     public static void sendAgain(Player player){
-        if(RSTask.getClickTask.containsKey(player)){
-            TaskFile file = RSTask.getClickTask.get(player);
+        if(RSTask.getTask().getClickTask.containsKey(player)){
+            TaskFile file = RSTask.getTask().getClickTask.get(player);
             if(file != null){
                 FormWindowModal simple = new FormWindowModal(task.getLag("title"),
                         RSTask.getTask().getLag("giveUpChose","§d§l您确定要放弃了 %s 任务吗?\n§c放弃后会丢失当前进度")
@@ -129,40 +126,56 @@ public class createMenu {
         }
     }
 
-    public static void sendTaskMenu(Player player, TaskFile file){
+    public static LinkedList<String> toTaskItemString(TaskItem[] items,Player player){
+        LinkedList<String> builder = new LinkedList<>();
+        for(TaskItem item:items){
+            playerFile file2 = playerFile.getPlayerFile(player.getName());
+            PlayerTaskClass taskClass = file2.getTaskByName(item.getTaskName()).getTaskClass();
+            int playerItem = taskClass.getLoad(item);
+            int taskCount = item.getEndCount();
+            if(item.getTaskTag() != TaskItem.TaskItemTag.diyName){
+                builder.add(ItemIDSunName.getIDByName(item.getItemClass().getItem())+"> "+playerItem+" / "+taskCount+"\n");
+            }else{
+                builder.add(item.getTask()+"> "+playerItem+" / "+taskCount+"\n");
+            }
 
-        FormWindowSimple simple = new FormWindowSimple(task.getLag("title"),"");
-        StringBuilder builder = new StringBuilder("");
+        }
+        return builder;
+    }
+
+    public static StringBuilder getTitles(TaskFile file){
+        StringBuilder builder = new StringBuilder();
         builder.append(RSTask.getTask().getLag("tast-title")).append("§r ").append(file.getTaskName()).append("\n");
         builder.append(RSTask.getTask().getLag("task-difficulty")).append("§r ").append(RSTask.getStar(file.getStar())).append("\n\n");
         builder.append(RSTask.getTask().getLag("task-introduce")).append("§r \n").append(file.getTaskMessage()).append("\n\n");
-        builder.append(RSTask.getTask().getLag("task-speed")).append("§r\n");
+        return builder;
+    }
+
+    public static void sendTaskMenu(Player player, TaskFile file){
+
+        FormWindowSimple simple = new FormWindowSimple(task.getLag("title"),"");
+        StringBuilder builder = new StringBuilder();
+        builder.append(getTitles(file));
         TaskFile file1 = TaskFile.getTask(file.getTaskName());
+        builder.append(RSTask.getTask().getLag("task-speed")).append("§r\n");
         TaskItem[] items = new TaskItem[]{};
         if(file1 != null){
             items = file1.getTaskItem();
         }
-        int i = 0;
+        LinkedList<String> linkedList = new LinkedList<>();
         if(items.length > 0){
-            for(TaskItem item:items){
-                int playerItem = playerFile.getPlayerFile(player.getName()).getTaskByName(item.getTaskName()).getTaskClass().getLoad(item);
-                int taskCount = item.getEndCount();
-                if(playerItem >= taskCount){
-                    i++;
-                }
-                if(item.getTaskTag() != TaskItem.TaskItemTag.diyName){
-                    builder.append(ItemIDSunName.getIDByName(item.getItemClass().getItem())).
-                            append(">").append(" ").append(playerItem).append(" / ").append(taskCount).append("\n");
-
-                }else{
-                    builder.append(item.getTask()).
-                            append(">").append(" ").append(playerItem).append(" / ").append(taskCount).append("\n");
-                }
+            CollectItemTask.onRun(player);
+            linkedList = toTaskItemString(items,player);
+            for(String s:linkedList){
+                builder.append(s);
             }
         }else{
             builder.append(RSTask.getTask().getLag("notTasks")).append("§r\n");
         }
+
         builder.append("\n\n");
+
+
         builder.append(RSTask.getTask().getLag("success-item")).append("§r\n");
         successItem successItem = file.getFristSuccessItem();
         if(!playerFile.getPlayerFile(player.getName()).isFrist(file)){
@@ -170,34 +183,7 @@ public class createMenu {
         }
         LinkedList<StringBuilder> builders = new LinkedList<>();
         if(successItem != null){
-            ItemClass[] classes = successItem.getItem();
-            CommandClass[] commandClasses = successItem.getCmd();
-            if(classes != null && classes.length > 0){
-                for(ItemClass itemClass:classes){
-                    if(itemClass != null){
-                        StringBuilder builder1 = new StringBuilder("");
-                        builder1.append(ItemIDSunName.getIDByName(itemClass.getItem())).append("*").append(itemClass.getItem().getCount());
-                        builders.add(builder1);
-                    }
-                }
-            }
-            if(commandClasses != null && commandClasses.length > 0){
-                for(CommandClass commandClass:commandClasses){
-                    if(commandClass != null){
-                        StringBuilder builder1 = new StringBuilder("");
-                        builder1.append(commandClass.getSendMessage());
-                        builders.add(builder1);
-                    }
-                }
-            }
-            if(successItem.getMoney() > 0){
-                builders.add(new StringBuilder(RSTask.getTask().getCoinName()).append(">").append(successItem.getMoney()));
-            }
-            if(RSTask.canOpen()){
-                if(successItem.getCount() > 0){
-                    builders.add(new StringBuilder(RSTask.getTask().getFName()).append(">").append(successItem.getCount()));
-                }
-            }
+            builders = successItem.toList();
         }
         if(builders.size() > 0){
             for(StringBuilder builder1:builders){
@@ -209,7 +195,7 @@ public class createMenu {
         builder.append("\n");
         simple.setContent(builder.toString());
 
-        if(playerFile.getPlayerFile(player.getName()).isSuccess(file) && i == items.length){
+        if(playerFile.getPlayerFile(player.getName()).isSuccess(file) && linkedList.size() == items.length){
             simple.addButton(getSuccessButton());
         }else{
             simple.addButton(getCancelButton());

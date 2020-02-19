@@ -23,8 +23,12 @@ public class ScoreTask{
     }
 
     public void init() {
-        if(!player.isOnline()) return;
-        if(!RSTask.getTask().canUseScore()) return;
+        if(!player.isOnline()) {
+            return;
+        }
+        if(!RSTask.getTask().canUseScore()) {
+            return;
+        }
         FakeScoreboard fakeScoreboard = new FakeScoreboard();
         fakeScoreboard.objective = ScoreMessage.getMessage(player);
         Server.getInstance().getScheduler().scheduleDelayedTask(new Task() {
@@ -32,15 +36,19 @@ public class ScoreTask{
             public void onRun(int i) {
                 fakeScoreboard.addPlayer(player);
             }
-        },20);
+        },30);
 
         Server.getInstance().getScheduler().scheduleRepeatingTask(new Task() {
             @Override
             public void onRun(int i) {
+                if(!player.isOnline()){
+                    this.cancel();
+                    return;
+                }
                 fakeScoreboard.objective = ScoreMessage.getMessage(player);
                 fakeScoreboard.update();
             }
-        },30);
+        },20);
     }
 }
 class ScoreMessage{
@@ -56,12 +64,11 @@ class ScoreMessage{
             a = 0;
         }
         TaskFile file = null;
-        if(RSTask.getClickTask.containsKey(player) &&
-                !playerFile.getPlayerFile(player.getName()).isSuccess(RSTask.getClickTask.get(player))
-                &&playerFile.getPlayerFile(player.getName()).isRunning(RSTask.getClickTask.get(player).getTaskName())){
-            file = RSTask.getClickTask.get(player);
+        if(RSTask.getTask().getClickTask.containsKey(player) &&
+                !playerFile.getPlayerFile(player.getName()).isSuccess(RSTask.getTask().getClickTask.get(player))){
+            file = RSTask.getTask().getClickTask.get(player);
         }else{
-            playerFile file1 = new playerFile(player.getName());
+            playerFile file1 = playerFile.getPlayerFile(player.getName());
             if(file1.getInviteTasks().size() > 0){
                 file = file1.getInviteTasks().get(0).getTaskFile();
             }
@@ -71,13 +78,16 @@ class ScoreMessage{
             items = file.getTaskItem();
         }
         LinkedList<String> builder1 = new LinkedList<>();
+        playerFile file1 = playerFile.getPlayerFile(player.getName());
+
         if(items.length != 0){
+
             for(TaskItem item:items){
                 if(item.getTaskTag() == TaskItem.TaskItemTag.diyName){
-                    int playerItem = playerFile.getPlayerFile(player.getName()).getTaskByName(item.getTaskName()).getTaskClass().getLoad(item);
+                    int playerItem = file1.getTaskByName(item.getTaskName()).getTaskClass().getLoad(item);
                     builder1.add(item.getTask()+">"+playerItem+" / "+item.getEndCount());
                 }else{
-                    int playerItem = playerFile.getPlayerFile(player.getName()).getTaskByName(item.getTaskName()).getTaskClass().getLoad(item);
+                    int playerItem = file1.getTaskByName(item.getTaskName()).getTaskClass().getLoad(item);
                     builder1.add(ItemIDSunName.getIDByName(item.getItemClass().getItem())+">"+playerItem+" / "+item.getEndCount());
                 }
 

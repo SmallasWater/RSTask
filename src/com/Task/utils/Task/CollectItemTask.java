@@ -2,7 +2,6 @@ package com.Task.utils.Task;
 
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import com.Task.utils.Tasks.TaskFile;
 import com.Task.utils.Tasks.TaskItems.ItemClass;
@@ -17,7 +16,7 @@ import java.util.LinkedList;
 public class CollectItemTask{
 
     public static void onRun(Player player) {
-        playerFile file = new playerFile(player.getName());
+        playerFile file = playerFile.getPlayerFile(player.getName());
         LinkedList<playerTask> tasks = file.getPlayerTasks();
         for(playerTask task:tasks){
             if(task.getTaskFile().getType() == TaskFile.TaskType.CollectItem){
@@ -27,7 +26,7 @@ public class CollectItemTask{
     }
 
     private static void add(Player player,String taskName,TaskItem[] items){
-        playerFile file = new playerFile(player.getName());
+        playerFile file = playerFile.getPlayerFile(player.getName());
         for(TaskItem item:items){
             if(item != null){
                 ItemClass itemClass = ItemClass.toItem(item);
@@ -35,8 +34,10 @@ public class CollectItemTask{
                     item.setEndCount(getCount(player,itemClass));
                     file.setTaskValue(taskName,item);
                 }
+
             }
         }
+        file.toSave();
     }
 
     /** 获取物品数量 */

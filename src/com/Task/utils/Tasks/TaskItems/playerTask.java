@@ -26,8 +26,8 @@ public class playerTask {
         if(taskFile != null){
             TaskItem[] items = new TaskItem[taskFile.getTaskItem().length];
             for(int i=0;i < items.length;i++){
-                TaskItem item = taskFile.getTaskItem()[i];
-                item.setEndCount(0);
+                TaskItem itemF = taskFile.getTaskItem()[i];
+                TaskItem item = new TaskItem(itemF.getTaskName(),itemF.getTask(),0);
                 items[i] = item;
             }
             taskClass = new PlayerTaskClass(taskName,items,new Date(),0);
@@ -40,8 +40,8 @@ public class playerTask {
         this.taskFile = taskName;
         TaskItem[] items = new TaskItem[taskFile.getTaskItem().length];
         for(int i=0;i < items.length;i++){
-            TaskItem item = taskFile.getTaskItem()[i];
-            item.setEndCount(0);
+            TaskItem itemF = taskFile.getTaskItem()[i];
+            TaskItem item = new TaskItem(itemF.getTaskName(),itemF.getTask(),0);
             items[i] = item;
         }
         taskClass = new PlayerTaskClass(taskName.getTaskName(),items,new Date(),0);
@@ -99,5 +99,10 @@ public class playerTask {
         this.TaskName = task.getTaskName();
         this.taskFile = task.getTaskFile();
         this.taskClass = task.getTaskClass();
+    }
+
+    @Override
+    public String toString() {
+        return "{TaskName:"+TaskName+"TaskFile:"+taskFile.toString()+"taskClass"+taskClass.toString()+"}";
     }
 }
