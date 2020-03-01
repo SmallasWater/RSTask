@@ -35,33 +35,33 @@ public class createMenu {
                         (task.getLag("title"),(RSTask.canOpen())?
                                 (task.getLag("player-task-integral").replace("%c",playerFiles.getCount()+"").replace("%f",RSTask.getTask().getFName()))
                                 : "");
-        int i = 1;
+        int i = 0;
         Map map = ((Map)task.getConfig().get("自定义图片路径"));
         for (Object o:map.keySet()){
-            if(o instanceof String){
-                String s = " ";
-                if(RSTask.canOpen()){
-                    if(playerFiles.canLock(i)){
-                        if(RSTask.getTask().canShowLodding()){
-                            if(playerFiles.getCanInviteTasks(i).size() == 0 && playerFiles.getInviteTasks(i).size() == 0 && playerFiles.getSuccessTasks(i).size() == 0){
-                                s = (RSTask.getTask().getLag("success-all"));
-                            }else if(playerFiles.getSuccessTasks(i).size() > 0){
-                                s = (RSTask.getTask().getLag("task-message-success").replace("%c",playerFiles.getSuccessTasks(i).size()+""));
-                            }else if(playerFiles.getInviteTasks(i).size() > 0){
-                                s = (RSTask.getTask().getLag("task-message-lodding").replace("%c",playerFiles.getInviteTasks(i).size()+""));
-                            }else if(playerFiles.getCanInviteTasks(i).size() > 0){
-                                s = (RSTask.getTask().getLag("task-message-can-receive").replace("%c",playerFiles.getCanInviteTasks(i).size()+""));
-                            }
+            Map map1 = (Map) map.get(o);
+            String s = " ";
+            if(RSTask.canOpen()){
+                if(playerFiles.canLock(i)){
+                    if(RSTask.getTask().canShowLodding()){
+                        if(playerFiles.getCanInviteTasks(i).size() == 0 && playerFiles.getInviteTasks(i).size() == 0 && playerFiles.getSuccessTasks(i).size() == 0){
+                            s = (RSTask.getTask().getLag("success-all"));
+                        }else if(playerFiles.getSuccessTasks(i).size() > 0){
+                            s = (RSTask.getTask().getLag("task-message-success").replace("%c",playerFiles.getSuccessTasks(i).size()+""));
+                        }else if(playerFiles.getInviteTasks(i).size() > 0){
+                            s = (RSTask.getTask().getLag("task-message-lodding").replace("%c",playerFiles.getInviteTasks(i).size()+""));
+                        }else if(playerFiles.getCanInviteTasks(i).size() > 0){
+                            s = (RSTask.getTask().getLag("task-message-can-receive").replace("%c",playerFiles.getCanInviteTasks(i).size()+""));
                         }
-                    }else{
-                        s = (RSTask.getTask().getLag("Lock").replace("%c",RSTask.starNeed(i)+"").replace("%f",RSTask.getTask().getFName()));
                     }
+                }else{
+                    s = (RSTask.getTask().getLag("Lock").replace("%c",RSTask.starNeed(i)+"").replace("%f",RSTask.getTask().getFName()));
                 }
-                ElementButton button = new ElementButton(o+s);
-                ElementButtonImageData imageData = new ElementButtonImageData("path",(String) map.get(o));
-                button.addImage(imageData);
-                simple.addButton(button);
             }
+            ElementButton button = new ElementButton(map1.get("名称")+s);
+            ElementButtonImageData imageData = new ElementButtonImageData(map1.get("图片类型").toString().equals("网络")?"url":"path",(String) map1.get("图片路径"));
+            button.addImage(imageData);
+            simple.addButton(button);
+
             i ++ ;
         }
         send(player,simple,Menu);
@@ -130,15 +130,17 @@ public class createMenu {
         LinkedList<String> builder = new LinkedList<>();
         for(TaskItem item:items){
             playerFile file2 = playerFile.getPlayerFile(player.getName());
-            PlayerTaskClass taskClass = file2.getTaskByName(item.getTaskName()).getTaskClass();
-            int playerItem = taskClass.getLoad(item);
-            int taskCount = item.getEndCount();
-            if(item.getTaskTag() != TaskItem.TaskItemTag.diyName){
-                builder.add(ItemIDSunName.getIDByName(item.getItemClass().getItem())+"> "+playerItem+" / "+taskCount+"\n");
-            }else{
-                builder.add(item.getTask()+"> "+playerItem+" / "+taskCount+"\n");
+            playerTask task = file2.getTaskByName(item.getTaskName());
+            if(task != null){
+                PlayerTaskClass taskClass = task.getTaskClass();
+                int playerItem = taskClass.getLoad(item);
+                int taskCount = item.getEndCount();
+                if(item.getTaskTag() != TaskItem.TaskItemTag.diyName){
+                    builder.add(ItemIDSunName.getIDByName(item.getItemClass().getItem())+"> "+playerItem+" / "+taskCount+"\n");
+                }else{
+                    builder.add(item.getTask()+"> "+playerItem+" / "+taskCount+"\n");
+                }
             }
-
         }
         return builder;
     }

@@ -344,11 +344,11 @@ public class playerFile {
                     if(isRunning(taskFile.getTaskName())){
                         return PlayerTaskType.Running;
                     }
-                    if(isSuccessed(taskFile.getTaskName()) && !canInvite(taskFile.getTaskName())){
-                        return PlayerTaskType.isSuccess_noInvite;
-                    }
                     if(isSuccess(taskFile)){
                         return PlayerTaskType.Success;
+                    }
+                    if(isSuccessed(taskFile.getTaskName()) && !canInvite(taskFile.getTaskName())){
+                        return PlayerTaskType.isSuccess_noInvite;
                     }
                 }
             }
@@ -430,7 +430,7 @@ public class playerFile {
     public LinkedList<playerTask> getTasksByType(PlayerTaskType taskType,int level){
         LinkedList<playerTask> tasks = new LinkedList<>();
         for(playerTask task:playerTasks){
-            if(task.getTaskFile().getStar() == level){
+            if(task.getTaskFile().getGroup() == level){
                 if(getTaskType(task.getTaskFile()) == taskType){
                     tasks.add(task);
                 }
@@ -467,7 +467,7 @@ public class playerFile {
     /** 判断此难度是否解锁(需开启积分验证)
      1级难度默认解锁 */
     public boolean canLock(int star) {
-        return !RSTask.countChecking || (getCount() >= RSTask.starNeed(star));
+        return RSTask.countChecking && (getCount() >= RSTask.starNeed(star));
     }
 
 

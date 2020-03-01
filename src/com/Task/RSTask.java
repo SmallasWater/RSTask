@@ -12,6 +12,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import com.Task.commands.runTaskCommand;
+import com.Task.utils.DataTool;
 import com.Task.utils.Task.CollectItemTask;
 import com.Task.utils.Task.ListerEvents;
 import com.Task.utils.Tasks.TaskFile;
@@ -25,6 +26,7 @@ import com.Task.utils.events.playerClickTaskEvent;
 import com.Task.utils.events.playerOpenBookEvent;
 import com.Task.utils.form.ListenerMenu;
 import com.Task.utils.form.createMenu;
+import de.theamychan.scoreboard.network.Scoreboard;
 import org.jline.utils.Log;
 
 import java.io.File;
@@ -33,6 +35,8 @@ import java.util.*;
 
 
 public class RSTask extends PluginBase{
+
+    public static final String CONFIG_VERSION = "1.4.1";
     private static RSTask task;
 
     public static LinkedList<String> taskNames = new LinkedList<>();
@@ -45,7 +49,7 @@ public class RSTask extends PluginBase{
 
     public LinkedHashMap<String,playerFile> playerFiles = new LinkedHashMap<>();
 
-    public static boolean loadSocket = true;
+    public static boolean loadSocket = false;
 
     public static boolean loadEconomyAPI = false;
 
@@ -63,7 +67,7 @@ public class RSTask extends PluginBase{
 
     public static boolean canSuccess = false;
 
-    public LinkedList<Player> bookOpen = new LinkedList<>();
+//    public LinkedList<Player> bookOpen = new LinkedList<>();
 
     public LinkedHashMap<String,Config> playerConfig = new LinkedHashMap<>();
 
@@ -71,6 +75,7 @@ public class RSTask extends PluginBase{
 
     private Config lag;
 
+    public LinkedHashMap<Player, Scoreboard> scores = new LinkedHashMap<>();
 
 
     private String[] defaultFirstName = new String[]{
@@ -382,8 +387,15 @@ public class RSTask extends PluginBase{
 
     /**获取难度需要积分 */
     public static int starNeed(int star){
-        int add = RSTask.getTask().getConfig().getInt("任务等级增幅");
-        return ((star * add) - 100);
+        Map map = (Map) RSTask.getTask().getConfig().get("自定义图片路径");
+        if(map.containsKey(star)){
+            Map map1 = (Map) map.get(star);
+            return (int) map1.get("解锁积分");
+        }else{
+            return 0;
+        }
+//        int add = RSTask.getTask().getConfig().getInt("任务等级增幅");
+//        return ((star * add));
     }
 
     public static void sendMessage(Player player,String message){
@@ -605,6 +617,20 @@ public class RSTask extends PluginBase{
         if(!new File(this.getDataFolder()+"/config").exists()){
             this.saveDefaultConfig();
             this.reloadConfig();
+        }else{
+            String v1 = getConfig().getString("version","1.0.0");
+            if(DataTool.compareVersion(CONFIG_VERSION,v1) == 1){
+                this.getLogger().debug("检测到新版本 配置文件 正在进行更新...");
+                File file = new File(this.getDataFolder()+"/config.yml");
+                if(file.delete()){
+                    this.saveDefaultConfig();
+                    this.reloadConfig();
+                    this.getLogger().debug("配置文件更新完毕 当前配置版本: "+CONFIG_VERSION);
+                }else{
+                    this.getLogger().debug("配置文件删除失败 请手动删除");
+                }
+            }
+
         }
         if(!new File(this.getDataFolder()+"/language.properties").exists()){
             this.saveResource("language.properties",false);
@@ -618,21 +644,25 @@ public class RSTask extends PluginBase{
             }
         }
         if(canUseScore()){
-            for(int i = 1;i <= 5;i++){
-                if(Server.getInstance().getPluginManager().getPlugin("ScoreboardAPI") != null){
-                    loadSocket = true;
-                    break;
-                }else{
-                    Server.getInstance().getLogger().warning("未检测到ScoreboardAPI");
-                    Server.getInstance().getLogger().warning("尝试"+i+"次重载");
-                    Server.getInstance().getPluginManager().loadPlugin(this.getServer().getFilePath()+"/plugins/ScoreboardAPI.jar");
-                }
-            }
-            if(Server.getInstance().getPluginManager().getPlugin("ScoreboardAPI") == null){
-                Server.getInstance().getLogger().warning("ScoreboardAPI加载失败");
+            try{
+                Class.forName("de.theamychan.scoreboard.ScoreboardPlugin");
+                loadSocket = true;
+
+            }catch (ClassNotFoundException e) {
+                Server.getInstance().getLogger().warning("未检测到ScoreboardAPI 前置");
+                loadSocket = false;
             }
         }
         init();
     }
 
+    @Override
+    public void onDisable() {
+        for(TaskFile file:tasks.values()){
+            file.toSaveConfig();
+        }
+        for(playerFile player:playerFiles.values()){
+            player.toSave();
+        }
+    }
 }

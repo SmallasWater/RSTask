@@ -6,10 +6,7 @@ package com.Task.utils.Tasks.TaskItems;
 import com.Task.RSTask;
 import com.Task.utils.ItemIDSunName;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -80,18 +77,18 @@ public class successItem {
 
     public void addCmdClass(CommandClass commandClass){
         if(commandClass != null){
-            CommandClass[] commandClasses = new CommandClass[cmd.length+1];
-            commandClasses[cmd.length] = commandClass;
-            cmd = commandClasses;
+            LinkedList<CommandClass> classes = new LinkedList<>(Arrays.asList(cmd));
+            classes.add(commandClass);
+            cmd = classes.toArray(new CommandClass[0]);
         }
     }
 
 
     public void addItemClass(ItemClass itemClass){
         if(itemClass != null){
-            ItemClass[] itemClasses = new ItemClass[item.length+1];
-            itemClasses[cmd.length] = itemClass;
-            item = itemClasses;
+            LinkedList<ItemClass> classes = new LinkedList<>(Arrays.asList(item));
+            classes.add(itemClass);
+            item = classes.toArray(new ItemClass[0]);
         }
 
     }
@@ -107,10 +104,14 @@ public class successItem {
         LinkedList<String> CmdList = new LinkedList<>();
 
         for(ItemClass item:this.item){
-            ItemList.add(item.toSaveConfig());
+            if(item != null){
+                ItemList.add(item.toSaveConfig());
+            }
         }
         for(CommandClass cmd:this.cmd){
-            CmdList.add(cmd.toString());
+            if(cmd != null){
+                CmdList.add(cmd.toString());
+            }
         }
         conf.put("Items",ItemList);
         conf.put("Cmd",CmdList);

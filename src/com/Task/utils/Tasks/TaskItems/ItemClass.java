@@ -80,7 +80,9 @@ public class ItemClass {
      * */
 
     public static ItemClass toItem(String defaultString){
-        if(defaultString == null) return null;
+        if(defaultString == null) {
+            return null;
+        }
         if(defaultString.split("@").length > 1){
             if(defaultString.split(":").length < 2){
                 return toItem(new TaskItem(null, defaultString, 0));

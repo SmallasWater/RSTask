@@ -18,7 +18,6 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
-import cn.nukkit.scheduler.AsyncTask;
 import com.Task.RSTask;
 import com.Task.utils.DataTool;
 import com.Task.utils.ItemIDSunName;
@@ -28,11 +27,9 @@ import com.Task.utils.Tasks.TaskItems.*;
 import com.Task.utils.Tasks.playerFile;
 import com.Task.utils.events.*;
 import com.Task.utils.form.createMenu;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.concurrent.*;
 
 public class ListerEvents implements Listener{
 
@@ -115,7 +112,7 @@ public class ListerEvents implements Listener{
             RSTask.getTask().playerConfig.put(player.getName(),RSTask.getTask().getPlayerConfig(player.getName()));
         }
         if(RSTask.loadSocket){
-            new ScoreTask(player).init();
+            Server.getInstance().getScheduler().scheduleRepeatingTask(new ScoreTask(player),20);
         }
     }
 
@@ -207,6 +204,7 @@ public class ListerEvents implements Listener{
             player.sendMessage(RSTask.getTask().getLag("CreateUI","§d§l[任务系统]§c创造模式无法唤醒UI"));
             return;
         }
+
         if(file != null){
             playerFile file1 = playerFile.getPlayerFile(player.getName());
             file1.addTask(file);

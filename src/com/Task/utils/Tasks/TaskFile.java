@@ -31,6 +31,9 @@ public class TaskFile {
     /** 任务难度 */
     private int star = 1;
 
+    /** 任务分组 */
+    private int group;
+
     /** 任务介绍 */
     private String TaskMessage = null;
 
@@ -124,6 +127,7 @@ public class TaskFile {
         this.TaskName = taskName;
         this.TaskMessage = taskMessage;
         this.star = star;
+        this.group = star-1;
         this.successItem = item;
         this.task = task;
         this.day = day;
@@ -181,6 +185,7 @@ public class TaskFile {
         Config config = RSTask.getTask().getTaskConfig(TaskName);
 
         config.set("任务难度",star);
+        config.set("任务分组",group);
         config.set("任务介绍",TaskMessage == null ? "无":TaskMessage);
         config.set("刷新时间(天)",day);
         config.set("任务类型",type.getTaskType());
@@ -199,6 +204,14 @@ public class TaskFile {
         config.set("自定义按键图片",button.toSaveConfig());
         config.save();
         RSTask.getTask().taskConfig.put(TaskName,config);
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
+    }
+
+    public int getGroup() {
+        return group;
     }
 
     public void setDay(int day) {
@@ -346,10 +359,11 @@ public class TaskFile {
                 if(type == null) {
                     return null;
                 }
-                return new TaskFile(taskName,type,taskItems,config.getString("任务介绍")
+                TaskFile file = new TaskFile(taskName,type,taskItems,config.getString("任务介绍")
                         ,config.getInt("任务难度"),second,first,config.getString("完成此任务前需完成"),
                         +config.getInt("刷新时间(天)"),config.getInt("完成公告类型(0/1)"),config.getString("公告内容"),TaskButton.toTaskButton((Map) config.get("自定义按键图片")));
-
+                file.setGroup(config.getInt("任务分组",file.getStar() - 1));
+                return file;
             }
 
         }catch (Exception e){
@@ -405,15 +419,13 @@ public class TaskFile {
             }
         }
         return names;
-
-
     }
 
     /** 获取同一级别难度的任务 */
     public static LinkedList<TaskFile> getDifficultyTasks(int star){
         LinkedList<TaskFile> files = new LinkedList<>();
         for (TaskFile file:RSTask.getTask().tasks.values()){
-            if(file.getStar() == star) {
+            if(file.getGroup() == star) {
                 files.add(file);
             }
         }
@@ -424,15 +436,21 @@ public class TaskFile {
         playerFile file1 = playerFile.getPlayerFile(player.getName());
         playerFile.PlayerTaskType type = file1.getTaskType(file);
         if(type == playerFile.PlayerTaskType.can_Invite || type == playerFile.PlayerTaskType.isSuccess_canInvite){
-            playerAddTaskEvent event1= new playerAddTaskEvent(player,file);
-            Server.getInstance().getPluginManager().callEvent(event1);
-            return true;
+            int starCount = RSTask.starNeed(file.getGroup());
+            if(RSTask.canOpen() && file1.getCount() < starCount){
+                player.sendMessage(RSTask.getTask().getLag("not-add-task","§c[任务系统] 抱歉，此任务不能领取"));
+                return false;
+            }else{
+                playerAddTaskEvent event1= new playerAddTaskEvent(player,file);
+                Server.getInstance().getPluginManager().callEvent(event1);
+                return true;
+            }
         }
         if(type == playerFile.PlayerTaskType.Running){
             return true;
         }
         if((file.getLastTask() != null && !file.getLastTask().equals("null") && !file.getLastTask().equals(""))){
-            if(!file1.issetTask(file.getLastTask())){
+            if(!file1.isSuccessed(file.getLastTask())){
                 player.sendMessage(RSTask.getTask().getLag("useLastTask").replace("%s",file.getLastTask()));
                 return false;
             }

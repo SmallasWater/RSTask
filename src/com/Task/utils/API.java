@@ -28,7 +28,7 @@ public class API {
      * @param taskName 任务名称
      * @return 是否删除成功
      * */
-    public static boolean createTask(String taskName) {
+    public static boolean deleteTask(String taskName) {
        TaskFile task = TaskFile.getTask(taskName);
        if(task != null){
            delTaskEvent event = new delTaskEvent(task);

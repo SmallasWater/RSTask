@@ -42,7 +42,7 @@ public class ListenerMenu implements Listener{
                     if(data.equals("null")) {
                         return;
                     }
-                    int starCount = RSTask.starNeed(Integer.parseInt(data)+1);
+                    int starCount = RSTask.starNeed(Integer.parseInt(data));
                     if(RSTask.canOpen()){
                         playerFile pf = playerFile.getPlayerFile(player.getName());
                         if(pf.getCount() < starCount){
@@ -50,7 +50,7 @@ public class ListenerMenu implements Listener{
                             return;
                         }
                     }
-                    RSTask.getClickStar.put(player,Integer.parseInt(data)+1);
+                    RSTask.getClickStar.put(player,Integer.parseInt(data));
                     createMenu.sendTaskList(player,RSTask.getClickStar.get(player));
                     break;
                 case createMenu.Tasks:
