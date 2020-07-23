@@ -34,7 +34,7 @@ public class TaskBook {
         if(book.hasCompoundTag()){
             this.title = book.getNamedTag().getString("bookTaskName");
         }
-        if(title.equalsIgnoreCase("")){
+        if("".equalsIgnoreCase(title)){
             title = book.getCustomName();
         }
         if(book.getNamedTag() != null){
