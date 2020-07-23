@@ -53,7 +53,7 @@ public class AddTaskValueSubCommand extends BaseSubCommand {
                 return false;
             }
         }else{
-            if(args.length > 5 && args[5].equalsIgnoreCase("true")) {
+            if(args.length > 5 && "true".equalsIgnoreCase(args[5])) {
                 sender.sendMessage("§6[§7任务系统§6] §c玩家" + player + "不在线");
             }
         }
