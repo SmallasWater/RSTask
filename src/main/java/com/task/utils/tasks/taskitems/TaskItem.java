@@ -85,12 +85,7 @@ public class TaskItem {
 
 
     public enum TaskItemTag{
-        /** nbt物品*/
-        NbtItem,
-        /**普通物品*/
-        defaultItem,
-        /**自定义名称*/
-        diyName
+        NbtItem,defaultItem,diyName
     }
 
 
