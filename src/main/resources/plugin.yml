@@ -9,9 +9,11 @@
 name: RSTask
 api: ["1.0.8"]
 version: "1.6.1"
-main: com.smallaswater.task.RsTask
+main: com.task.RsTask
 author: "若水"
 load: POSTWORLD
+softdepend:
+ - AutoUpData
 
 permissions:
  RSTask.command.rank:

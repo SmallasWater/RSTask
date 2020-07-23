@@ -15,7 +15,13 @@
             <scope>system</scope>
             <systemPath> F:/Nukkit驱动/nukkit-1.16.jar</systemPath>
         </dependency>
-
+        <dependency>
+            <groupId>net.autoupdata</groupId>
+            <artifactId>updata</artifactId>
+            <version>1.1.7</version> <!-- 记得修改到已经安装到本地库最新版本 -->
+            <scope>system</scope>
+            <systemPath>F:/Nukkit开服/plugins/AutoUpData_v1.2.3.jar</systemPath>
+        </dependency>
         <dependency>
             <groupId>me.onebone</groupId>
             <artifactId>economyapi</artifactId>

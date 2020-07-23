@@ -6,6 +6,7 @@ import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBookWritten;
+import com.task.RsTask;
 import com.task.commands.base.BaseSubCommand;
 import com.task.utils.events.PlayerOpenBookEvent;
 import com.task.utils.task.CollectItemTask;
@@ -32,7 +33,7 @@ public class BookUpSubCommand extends BaseSubCommand {
         Item item = ((Player) sender).getInventory().getItemInHand();
         if(item instanceof ItemBookWritten){
             if(TaskBook.isBook((ItemBookWritten) item)){
-                Server.getInstance().getScheduler().scheduleDelayedTask(new CollectItemTask((Player) sender),1);
+                Server.getInstance().getScheduler().scheduleDelayedTask(new CollectItemTask(RsTask.getTask(),(Player) sender),1);
                 PlayerOpenBookEvent event = new PlayerOpenBookEvent(
                         (Player) sender,TaskBook.getTaskBookByItem(((ItemBookWritten) item)));
                 Server.getInstance().getPluginManager().callEvent(event);

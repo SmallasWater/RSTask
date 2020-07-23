@@ -2,7 +2,10 @@ package com.task.utils.task;
 
 
 import cn.nukkit.Player;
+import cn.nukkit.plugin.Plugin;
+import cn.nukkit.scheduler.PluginTask;
 import cn.nukkit.scheduler.Task;
+import com.task.RsTask;
 import com.task.utils.DataTool;
 import com.task.utils.tasks.TaskFile;
 import com.task.utils.tasks.taskitems.ItemClass;
@@ -17,10 +20,11 @@ import java.util.LinkedList;
  * 玩家收集物品任务
  *
  * @author SmallasWater*/
-public class CollectItemTask extends Task {
+public class CollectItemTask extends PluginTask<RsTask> {
 
     private Player player;
-    public CollectItemTask(Player player){
+    public CollectItemTask(RsTask plugin,Player player){
+        super(plugin);
         this.player = player;
     }
 

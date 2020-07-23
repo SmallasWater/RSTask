@@ -2,6 +2,7 @@ package com.task.utils.task;
 
 
 import cn.nukkit.Server;
+import cn.nukkit.scheduler.PluginTask;
 import cn.nukkit.scheduler.Task;
 import com.task.RsTask;
 import com.task.utils.tasks.taskitems.PlayerTask;
@@ -12,7 +13,11 @@ import com.task.utils.events.TaskTimeOutEvent;
  * 检查任务状态
  * @author SmallasWater
  */
-public class ChunkTaskTask extends Task {
+public class ChunkTaskTask extends PluginTask<RsTask> {
+    public ChunkTaskTask(RsTask owner) {
+        super(owner);
+    }
+
     @Override
     public void onRun(int i) {
         for(PlayerFile file: RsTask.getTask().playerFiles.values()){

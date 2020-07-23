@@ -106,14 +106,14 @@ public class ListenerMenu implements Listener{
     }
 
     private void decodeClickTask(Player player,String data){
-        if(data.equals("null")) {
+        if("null".equals(data)) {
             return;
         }
         if(Integer.parseInt(data) == 0){
             if(RsTask.getTask().getClickTask.containsKey(player)){
                 TaskFile file1 = RsTask.getTask().getClickTask.get(player);
                 PlayerFile file2 = PlayerFile.getPlayerFile(player.getName());
-                Server.getInstance().getScheduler().scheduleDelayedTask(new CollectItemTask(player),1);
+                Server.getInstance().getScheduler().scheduleDelayedTask(new CollectItemTask(RsTask.getTask(),player),1);
                 if(file2.isSuccess(file1.getTaskName())){
                     PlayerFile.givePlayerSuccessItems(player,file1.getTaskName());
                 }else{

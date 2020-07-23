@@ -20,6 +20,7 @@ import com.task.utils.tasks.taskitems.ItemClass;
 import com.task.utils.tasks.PlayerFile;
 import com.task.utils.form.ListenerMenu;
 import org.jline.utils.Log;
+import updata.AutoData;
 
 import java.io.File;
 
@@ -64,9 +65,9 @@ public class RsTask extends PluginBase{
 
     public int count = 10;
 
-    private LinkedHashMap<String,Config> playerConfig = new LinkedHashMap<>();
+    private LinkedHashMap<String, Config> playerConfig = new LinkedHashMap<>();
 
-    public LinkedHashMap<String,Config> taskConfig = new LinkedHashMap<>();
+    public LinkedHashMap<String, Config> taskConfig = new LinkedHashMap<>();
 
     private Config lag;
 
@@ -85,6 +86,12 @@ public class RsTask extends PluginBase{
     public void onEnable() {
         task = this;
         this.getLogger().info("[RSTask] 启动任务系统插件");
+        if(Server.getInstance().getPluginManager().getPlugin("AutoUpData") != null){
+            if(AutoData.defaultUpData(this,getFile(),"SmallasWater","RSTask")){
+                return;
+            }
+        }
+
         this.getServer().getPluginManager().registerEvents(new ListenerMenu(),this);
         this.getServer().getPluginManager().registerEvents(new ListerEvents(),this);
 
@@ -93,8 +100,8 @@ public class RsTask extends PluginBase{
         if(countChecking) {
             this.getServer().getCommandMap().register("superTask", new RankCommand("c-rank"));
         }
-        this.getServer().getScheduler().scheduleRepeatingTask(new ChunkTaskTask(),20);
-        this.getServer().getScheduler().scheduleRepeatingTask(new ChunkPlayerInventoryBookTask(),20);
+        this.getServer().getScheduler().scheduleRepeatingTask(new ChunkTaskTask(this),20);
+        this.getServer().getScheduler().scheduleRepeatingTask(new ChunkPlayerInventoryBookTask(this),20);
 
 
     }
