@@ -11,7 +11,6 @@ import com.task.utils.tasks.taskitems.TaskItem;
 import com.task.utils.DataTool;
 import com.task.utils.events.PlayerCanInviteTaskEvent;
 import com.task.utils.events.PlayerTaskCloseEvent;
-import com.smallaswater.task.utils.tasks.taskitems.*;
 import com.task.utils.events.SuccessTaskEvent;
 import com.task.utils.events.UseTaskEvent;
 
@@ -216,13 +215,12 @@ public class PlayerFile {
                         i++;
                         item.addEndCount(value);
                         Boolean event = getBoolean(taskName, task, item);
-                        if (event != null) {
-                            return event;
+                        if (!event) {
+                            return false;
                         }
                         break;
                     }
                 }
-
             }
             return i > 0;
 
@@ -238,7 +236,7 @@ public class PlayerFile {
             Server.getInstance().getPluginManager().callEvent(event);
             return !event.isCancelled();
         }
-        return null;
+        return true;
     }
 
     /** 关闭一个任务
@@ -283,13 +281,9 @@ public class PlayerFile {
             TaskItem[] taskItems = task.getTaskClass().getValue();
             for(TaskItem item:taskItems){
                 if(item != null){
-                    if(item.getTask().equals(valueName)){
+                    if(item.getTask().equalsIgnoreCase(valueName)){
                         item.setEndCount(value);
-                        Boolean event = getBoolean(taskName, task, item);
-                        if (event != null) {
-                            return event;
-                        }
-                        return true;
+                        return getBoolean(taskName, task, item);
                     }
                 }
 

@@ -41,11 +41,11 @@ public class AddTaskValueSubCommand extends BaseSubCommand {
                     return false;
                 }
                 if(API.addPlayerRunTask(p.getName(), v.getTaskName(), v.getLoad(), v.getValue())){
-                    if(args.length > 5 && args[5].equalsIgnoreCase("true")) {
+                    if(args.length > 5 && "true".equalsIgnoreCase(args[5])) {
                         sender.sendMessage("§6[§7任务系统§6] §2成功给 §7" + p.getName() + "§2增加 §5" + v.getValue() + "§2点§r" + v.getTaskName() + "§2的" + v.getLoad() + "进度");
                     }
                 }else{
-                    if(args.length > 5 && args[5].equalsIgnoreCase("true")) {
+                    if(args.length > 5 && "true".equalsIgnoreCase(args[5])) {
                         sender.sendMessage("§6[§7任务系统§6] §7" + p.getName() + "§c增加§r" + v.getTaskName() + "的§5" + v.getLoad() + "§c进度失败");
                     }
                 }

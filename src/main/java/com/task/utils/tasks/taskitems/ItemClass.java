@@ -26,7 +26,7 @@ public class ItemClass {
 
     public ItemClass(int id,int mate,int count,String tag){
         Item item = Item.get(id,mate,count);
-        if(!tag.equals("not")){
+        if(!"not".equals(tag)){
             CompoundTag compoundTag = Item.parseCompoundTag(hexStringToBytes(tag));
             item.setNamedTag(compoundTag);
         }
@@ -43,7 +43,7 @@ public class ItemClass {
 
 
     private static byte[] hexStringToBytes(String hexString) {
-        if (hexString == null || hexString.equals("")) {
+        if (hexString == null || "".equals(hexString)) {
             return null;
         }
         hexString = hexString.toUpperCase();
@@ -90,7 +90,7 @@ public class ItemClass {
             if(defaultString.split(":").length < 2){
                 return toItem(new TaskItem(null, defaultString, 0));
             }else{
-                if(defaultString.split("@")[1].equals("item")){
+                if("item".equals(defaultString.split("@")[1])){
                     String ts = defaultString.split("@")[0];
                     String[] items = ts.split(":");
                     try {
@@ -99,7 +99,7 @@ public class ItemClass {
                     } catch (Exception e) {
                         return null;
                     }
-                }else if(defaultString.split("@")[1].equals("tag")){
+                }else if("tag".equals(defaultString.split("@")[1])){
                     String ts = defaultString.split("@")[0];
                     if(ts.split(":").length > 1){
                         if(RsTask.getTask().canExistsNumber(ts.split(":")[0])){

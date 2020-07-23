@@ -14,6 +14,9 @@ import java.util.Map;
 public class TaskButton {
 
     public enum ButtonImageType{
+        /**
+         * 按键贴图
+         * */
         Path("本地"),
         Url("网络");
         protected String name;
@@ -37,7 +40,7 @@ public class TaskButton {
         this(text,ButtonImageType.Path,"textures/items/book_enchanted");
     }
 
-    public TaskButton(String buttonText,ButtonImageType buttonType,String buttonData){
+    private TaskButton(String buttonText, ButtonImageType buttonType, String buttonData){
        text = buttonText;
        type = buttonType;
        data = buttonData;
@@ -80,7 +83,7 @@ public class TaskButton {
         ButtonImageType type;
         String data;
         if(map.containsKey("位置")){
-            type = map.get("位置").equals("本地")?ButtonImageType.Path:ButtonImageType.Url;
+            type = "本地".equals(map.get("位置"))?ButtonImageType.Path:ButtonImageType.Url;
         }else{
             return null;
         }

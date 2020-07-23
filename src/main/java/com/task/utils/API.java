@@ -123,9 +123,7 @@ public class API {
     public static boolean addPlayerRunTask(String player,String task,String load,int value){
         PlayerFile f = PlayerFile.getPlayerFile(player);
         if(f != null){
-            if(f.isRunning(task)){
-                return f.addTaskValue(task,load,value);
-            }
+            return f.addTaskValue(task,load,value);
         }
         return false;
     }
@@ -141,9 +139,7 @@ public class API {
     public static boolean setPlayerRunTask(String player,String task,String load,int value){
         PlayerFile f = PlayerFile.getPlayerFile(player);
         if(f != null){
-            if(f.isRunning(task)) {
-                return f.setTaskValue(task, load, value);
-            }
+            return f.setTaskValue(task, load, value);
         }
         return false;
     }
