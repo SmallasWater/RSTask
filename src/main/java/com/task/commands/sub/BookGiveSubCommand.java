@@ -38,7 +38,7 @@ public class BookGiveSubCommand extends BaseSubCommand {
             TaskBook book = new TaskBook(written);
 
             book.setTitle(file.getTaskName());
-            book.setCustomName(file.getShowName());
+            book.setCustomName(file.getName());
             book.writeIn("\n\n\n\n加载中...请再次打开");
             ((Player) sender).getInventory().setItemInHand(book.toBook().clone());
         }else{

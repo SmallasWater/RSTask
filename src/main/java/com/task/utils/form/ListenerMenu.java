@@ -44,7 +44,7 @@ public class ListenerMenu implements Listener{
             switch (fromId){
                 case CreateMenu.MENU:
                     // 测试难度1
-                    if(data.equals("null")) {
+                    if("null".equals(data)) {
                         return;
                     }
                     int starCount = DataTool.starNeed(Integer.parseInt(data));
@@ -59,7 +59,7 @@ public class ListenerMenu implements Listener{
                     CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
                     break;
                 case CreateMenu.TASKS:
-                    if(data.equals("null")) {
+                    if("null".equals(data)) {
                         return;
                     }
                     LinkedList<TaskFile> taskFiles = TaskFile.getDifficultyTasks(RsTask.getClickStar.get(player));
@@ -71,13 +71,13 @@ public class ListenerMenu implements Listener{
                     decodeClickTask(player,data);
                     break;
                 case CreateMenu.AGAIN:
-                    if(data.equals("null")){
+                    if("null".equals(data)){
                         if(RsTask.getTask().getClickTask.containsKey(player)){
                             CreateMenu.sendTaskMenu(player, RsTask.getTask().getClickTask.get(player));
                         }
                         return;
                     }
-                    if(data.equals("true")){
+                    if("true".equals(data)){
                         TaskFile file1 = RsTask.getTask().getClickTask.get(player);
                         PlayerGiveUpTaskEvent event1 = new PlayerGiveUpTaskEvent(file1,player);
                         Server.getInstance().getPluginManager().callEvent(event1);
@@ -130,7 +130,7 @@ public class ListenerMenu implements Listener{
     }
 
     private void decodeTask(Player player,String data){
-        if(data.equals("null")) {
+        if("null".equals(data)) {
             return;
         }
         Object[] uiData = DataTool.toArrayByData(data);

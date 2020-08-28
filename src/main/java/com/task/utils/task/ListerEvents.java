@@ -156,7 +156,7 @@ public class ListerEvents implements Listener{
         if(RsTask.showLoading){
             if(!file.isSuccess(newTask.getTaskName())){
                 String send = RsTask.getTask().getLag("run-task").
-                        replace("%s",task.getTaskFile().getShowName()).replace("%c", RsTask.getTask().
+                        replace("%s",task.getTaskFile().getName()).replace("%c", RsTask.getTask().
                         getTaskLoading(task.getTaskName(),player.getName())+"").replace("\\n","\n");
                 DataTool.sendMessage(player,send);
             }else{
@@ -164,7 +164,7 @@ public class ListerEvents implements Listener{
                     level.addSound(player.getPosition(),Sound.BLOCK_COMPOSTER_READY);
                     String send = RsTask.getTask().getLag("success-message")
                             .replace("%d",task.getTaskFile()
-                                    .getStar()+"").replace("%s",task.getTaskFile().getShowName()).replace("\\n","\n");
+                                    .getStar()+"").replace("%s",task.getTaskFile().getName()).replace("\\n","\n");
                     DataTool.sendMessage(player,send);
                 }
                 if(RsTask.canSuccess){
@@ -182,7 +182,7 @@ public class ListerEvents implements Listener{
         Player player = Server.getInstance().getPlayer(playerName);
         if(player != null){
             player.sendMessage(RsTask.getTask().getLag("task-time-out","§d§l[任务系统]§c 你的任务 %s 超时啦").
-                    replace("%s",event.getFile().getShowName()));
+                    replace("%s",event.getFile().getName()));
 
         }
 
@@ -201,7 +201,7 @@ public class ListerEvents implements Listener{
             return;
         }
         player.sendMessage(RsTask.getTask().getLag("giveUpTaskMessage","§d§l[任务系统]§b 您放弃了 %s 任务")
-                .replace("%s",file.getShowName()));
+                .replace("%s",file.getName()));
         RsTask.getTask().getClickTask.remove(player);
 
     }
@@ -236,7 +236,7 @@ public class ListerEvents implements Listener{
                 ItemBookWritten written = new ItemBookWritten();
                 TaskBook book = new TaskBook(written);
                 book.setTitle(file.getTaskName());
-                book.setCustomName(file.getShowName());
+                book.setCustomName(file.getName());
                 book.writeIn("\n\n\n\n加载中...请再次打开");
                 ItemBookWritten written1 =  book.toBook();
                 player.getInventory().addItem(written1.clone());
@@ -380,7 +380,7 @@ public class ListerEvents implements Listener{
         file = TaskFile.getTask(event.getTaskName());
         if(file != null){
             String send = file.getBroadcastMessage().
-                    replace("%p",player.getName()).replace("%s",file.getShowName());
+                    replace("%p",player.getName()).replace("%s",file.getName());
             if(file.getMessageType() == 0){
                 Server.getInstance().broadcastMessage(send);
             }else{

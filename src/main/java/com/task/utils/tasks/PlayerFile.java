@@ -333,6 +333,9 @@ public class PlayerFile {
             if(task.getTaskName().equals(taskName)){
                 return task;
             }
+            if(task.getTaskFile().getShowName().equalsIgnoreCase(taskName)){
+                return task;
+            }
         }
         return null;
     }
@@ -482,7 +485,7 @@ public class PlayerFile {
         }else{
             if(canInvite(taskFile.getTaskName())) {
                 String last = taskFile.getLastTask();
-                if (last != null && !last.equals("null")) {
+                if (last != null && !"null".equals(last)) {
                     if (issetTask(last) && isSuccessed(last)) {
                         return PlayerTaskType.can_Invite;
                     } else {

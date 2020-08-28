@@ -8,7 +8,7 @@
 # @author 若水
 name: RSTask
 api: ["1.0.8"]
-version: "1.6.1"
+version: "1.6.3"
 main: com.task.RsTask
 author: "若水"
 load: POSTWORLD
@@ -31,3 +31,6 @@ permissions:
  RSTask.command.reload-task:
   description: §c重新同步任务文件
   default: op
+ RSTask.command.reward:
+  description: §e悬赏任务
+  default: true

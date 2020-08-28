@@ -446,6 +446,7 @@ public class RsTask extends PluginBase{
             for (File file1 : files) {
                 if (file1.isFile()) {
                     String names = file1.getName().substring(0, file1.getName().lastIndexOf("."));
+                    this.getLogger().info("正在预读取 "+names+"任务");
                     taskConfig.put(names, new Config(this.getDataFolder() + "/Tasks/" + names + ".yml", Config.YAML));
                 }
             }

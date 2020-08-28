@@ -99,9 +99,14 @@ public class CreateMenu {
                         s = (RsTask.getTask().getLag("using"));
                         break;
                     case No_Invite:
-                        if(!file.getLastTask().equals("null")) {
+                        if(!"null".equals(file.getLastTask())) {
                             if (!playerFiles.isSuccessed(file.getLastTask())) {
-                                s = (RsTask.getTask().getLag("not-receive").replace("%s", file.getLastTask().trim()));
+                                String last = file.getLastTask();
+                                TaskFile file1 = file.getLastTaskFile();
+                                if(file1 != null){
+                                    last = file1.getName();
+                                }
+                                s = (RsTask.getTask().getLag("not-receive").replace("%s", last));
                                 break;
                             }
                         }
@@ -123,7 +128,7 @@ public class CreateMenu {
                             break;
                 }
                 ElementButton button = file.getButton().toButton();
-                button.setText(file.getShowName() + s);
+                button.setText(file.getName()+ s);
                 simple.addButton(button);
                 if(simple.getButtons().size() == 0){
                     simple.setContent((taskFiles.size() == 0)?"\n\n\n\n\n\n    "+ RsTask.getTask().getLag("no-task"):"");
@@ -139,7 +144,7 @@ public class CreateMenu {
             if(file != null){
                 FormWindowModal simple = new FormWindowModal(task.getLag("title"),
                         RsTask.getTask().getLag("giveUpChose","§d§l您确定要放弃了 %s 任务吗?{换行}§c放弃后会丢失当前进度")
-                                .replace("%s",file.getShowName()).replace("{换行}","\n"),"确定","取消");
+                                .replace("%s",file.getName()).replace("{换行}","\n"),"确定","取消");
 
                 send(player,simple, AGAIN);
             }
@@ -183,7 +188,7 @@ public class CreateMenu {
      * */
     public static StringBuilder getTitles(Player player,TaskFile file){
         StringBuilder builder = new StringBuilder();
-        builder.append(RsTask.getTask().getLag("tast-title")).append("§r ").append(file.getShowName()).append("\n");
+        builder.append(RsTask.getTask().getLag("tast-title")).append("§r ").append(file.getName()).append("\n");
         builder.append(RsTask.getTask().getLag("task-difficulty")).append("§r ").append(DataTool.getStar(file.getStar())).append("\n\n");
         builder.append(RsTask.getTask().getLag("task-introduce")).append("§r \n").append(file.getTaskMessage()).append("\n\n");
         PlayerFile file1 = PlayerFile.getPlayerFile(player.getName());

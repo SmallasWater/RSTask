@@ -104,9 +104,15 @@ public class TaskFile {
          * 获得 任务
          * */
         GetItem("获得"),
+
         EatItem("吃"),
+
         GetWater("打水"),
+
         Click("点击"),
+
+        Kill("击杀玩家"),
+
         DIY("自定义");
         protected String taskType;
         TaskType(String taskType){
@@ -199,6 +205,10 @@ public class TaskFile {
         return task;
     }
 
+    public TaskFile getLastTaskFile(){
+        return TaskFile.getTask(task);
+    }
+
     public void toSaveConfig(){
         if(taskName == null) {
             return;
@@ -224,7 +234,7 @@ public class TaskFile {
         config.set("持续时间(分钟)",loadDay);
         config.set("任务类型",type.getTaskType());
         config.set("完成次数限制",successCount);
-        if(task != null && !task.equals("null")) {
+        if(task != null && !"null".equals(task)) {
             config.set("完成此任务前需完成",task);
         }
         config.set("完成以下任务不能领取此任务",notInviteTasks);
@@ -243,7 +253,7 @@ public class TaskFile {
         RsTask.getTask().taskConfig.put(taskName,config);
     }
 
-    public void setShowName(String showName) {
+    private void setShowName(String showName) {
         this.showName = showName;
     }
 
@@ -365,6 +375,13 @@ public class TaskFile {
 
     public static TaskFile getTask(String taskName){
         return RsTask.getTask().tasks.get(taskName);
+    }
+
+    public String getName(){
+        if("null".equalsIgnoreCase(showName) || showName == null || "".equalsIgnoreCase(showName)){
+            return getTaskName();
+        }
+        return getShowName();
     }
 
     private static TaskFile toTask(String taskName){
@@ -499,7 +516,12 @@ public class TaskFile {
                     TaskFile file2 = TaskFile.toTask(name);
                     if(file2 != null) {
                         names.put(name,file2);
+                        RsTask.getTask().getLogger().info(name+" 任务加载成功.");
+                    }else{
+                        RsTask.getTask().getLogger().info(name+" 任务加载失败.");
                     }
+                }else{
+                    RsTask.getTask().getLogger().error("无法加载."+file1.getName()+" 文件");
                 }
             }
         }
@@ -545,9 +567,9 @@ public class TaskFile {
         if(type == PlayerFile.PlayerTaskType.Running || type == PlayerFile.PlayerTaskType.Success){
             return true;
         }
-        if((file.getLastTask() != null && !file.getLastTask().equals("null") && !file.getLastTask().equals(""))){
+        if((file.getLastTask() != null && !"null".equals(file.getLastTask()) && !"".equals(file.getLastTask()))){
             if(!file1.isSuccessed(file.getLastTask())){
-                player.sendMessage(RsTask.getTask().getLag("useLastTask").replace("%s",file.getLastTask()));
+                player.sendMessage(RsTask.getTask().getLag("useLastTask").replace("%s",file.getName()));
                 return false;
             }
         }
