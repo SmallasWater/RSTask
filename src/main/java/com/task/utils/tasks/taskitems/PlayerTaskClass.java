@@ -24,7 +24,7 @@ public class PlayerTaskClass {
     private boolean open = false;
 
     /** 任务名称 */
-    private String taskName;
+    private final String taskName;
 
     /** 完成次数 */
     private int count;
