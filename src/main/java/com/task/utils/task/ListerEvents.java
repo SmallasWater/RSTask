@@ -396,11 +396,11 @@ public class ListerEvents implements Listener{
 
     @EventHandler
     public void onDelTask(DelTaskEvent event){
-        TaskFile file = event.getTask();
+        TaskFile file = event.getFile();
 
         RsTask.getTask().tasks.remove(file.getTaskName());
         Server.getInstance().getLogger().info("[任务系统] 准备删除"+file.getTaskName()+"任务");
-        RsTask.getTask().taskConfig.remove(event.getTask().getTaskName());
+        RsTask.getTask().taskConfig.remove(event.getFile().getTaskName());
         Server.getInstance().getLogger().info("[任务系统] 开始查找玩家");
         LinkedList<String> players = RsTask.getTask().getPlayerNames();
         Server.getInstance().getLogger().info("[任务系统] 已查找到"+players.size()+"位玩家");
