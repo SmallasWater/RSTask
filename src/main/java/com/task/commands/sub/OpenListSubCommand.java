@@ -37,15 +37,7 @@ public class OpenListSubCommand extends OpenTaskSubCommand{
                 try {
                     int group = Integer.parseInt(list);
                     if(DataTool.existsGroup(group)) {
-                        if (RsTask.canOpen()) {
-                            int starCount = DataTool.starNeed(group);
-                            PlayerFile pf = PlayerFile.getPlayerFile(player.getName());
-                            if (pf.getCount() < starCount) {
-                                sender.sendMessage(TextFormat.RED+"玩家 "+playerName+"积分无法开启 "+group+" 分组");
-                                return true;
-                            }
-                        }
-                        RsTask.getClickStar.put(player, group);
+                        if (LaTestSubCommand.canOpenGroup(sender, playerName, player, group)) return true;
                         CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
                     }else{
                         sender.sendMessage(TextFormat.RED+"不存在分组: "+group);

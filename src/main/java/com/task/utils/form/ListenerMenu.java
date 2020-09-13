@@ -79,7 +79,7 @@ public class ListenerMenu implements Listener{
                     }
                     if("true".equals(data)){
                         TaskFile file1 = RsTask.getTask().getClickTask.get(player);
-                        PlayerGiveUpTaskEvent event1 = new PlayerGiveUpTaskEvent(file1,player);
+                        PlayerGiveUpTaskEvent event1 = new PlayerGiveUpTaskEvent(player,file1);
                         Server.getInstance().getPluginManager().callEvent(event1);
                         return;
                     }else{

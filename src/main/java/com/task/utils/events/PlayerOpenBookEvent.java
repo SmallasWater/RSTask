@@ -17,7 +17,7 @@ public class PlayerOpenBookEvent extends PlayerEvent {
         return HANDLERS;
     }
 
-    private TaskBook bookWritten;
+    private final TaskBook bookWritten;
 
     public PlayerOpenBookEvent(Player player, TaskBook written){
         this.player = player;

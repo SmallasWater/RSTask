@@ -19,6 +19,7 @@ public class TaskCommand extends BaseCommand {
         this.addSubCommand(new OpenTaskSubCommand("c"));
         this.addSubCommand(new OpenListSubCommand("clist"));
         this.addSubCommand(new CountSubCommand("count"));
+        this.addSubCommand(new LaTestSubCommand("latest"));
         this.loadCommandBase();
     }
 
@@ -43,6 +44,7 @@ public class TaskCommand extends BaseCommand {
         sender.sendMessage("§6[§7任务系统§6] §e->§f /task reload §7重新加载配置");
         sender.sendMessage("§6[§7任务系统§6] §e->§f /task c <玩家> <任务名> §7让玩家打开任务");
         sender.sendMessage("§6[§7任务系统§6] §e->§f /task clist <玩家> <分组> §7打开指定分组GUI");
+        sender.sendMessage("§6[§7任务系统§6] §e->§f /task latest <玩家> <分组> §打开这个分组玩家最新领取的任务");
         sender.sendMessage("§6[§7任务系统§6] §e->§f /task count <玩家> <积分> §7设置玩家任务积分");
     }
 }

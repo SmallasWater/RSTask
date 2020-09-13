@@ -17,7 +17,7 @@ public class UseTaskEvent extends PlayerEvent implements Cancellable {
         return HANDLERS;
     }
 
-    private PlayerTask taskItem;
+    private final PlayerTask taskItem;
 
     public UseTaskEvent(Player player, PlayerTask item){
         this.player = player;

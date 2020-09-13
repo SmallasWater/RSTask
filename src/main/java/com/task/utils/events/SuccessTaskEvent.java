@@ -15,7 +15,7 @@ public class SuccessTaskEvent extends PlayerEvent implements Cancellable {
         return HANDLERS;
     }
 
-    private String taskName;
+    private final String taskName;
 
     public SuccessTaskEvent(Player player, String taskName){
         this.player = player;
