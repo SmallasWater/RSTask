@@ -109,7 +109,6 @@ public class ListerEvents implements Listener{
                     TaskFile file1 = TaskFile.getTask(taskName);
                     if(file1 != null) {
                         event.setCancelled();
-
                         PlayerClickTaskEvent event1 = new PlayerClickTaskEvent(file1, player);
                         Server.getInstance().getPluginManager().callEvent(event1);
                     }
