@@ -561,6 +561,11 @@ public class RsTask extends PluginBase{
 
     }
 
+    public void savePlayerFile(){
+        for(PlayerFile player:playerFiles.values()){
+            player.toSave();
+        }
+    }
     @Override
     public void onDisable() {
         for(TaskFile file:tasks.values()){

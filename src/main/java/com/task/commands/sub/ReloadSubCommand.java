@@ -26,6 +26,7 @@ public class ReloadSubCommand extends BaseSubCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
+
         RsTask.getTask().loadTask();
         sender.sendMessage("§e任务重新读取");
         return true;

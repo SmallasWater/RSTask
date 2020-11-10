@@ -78,8 +78,7 @@ public class DataTool {
 
     public static int getTime(Date oldData) {
         long temp = System.currentTimeMillis() - oldData.getTime();
-        long temp2 = temp % (1000 * 3600);
-        return (int) temp2 / 1000 / 60;
+        return (int) temp / 1000 / 60;
     }
 
     public static DayTime getTimeByDay(int min){

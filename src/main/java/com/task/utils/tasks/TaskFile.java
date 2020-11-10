@@ -583,9 +583,11 @@ public class TaskFile {
         }
 
         if(!file1.inDay(file.getTaskName()) ){
+            //任务刷新时长 分钟
             int day = file.getDay();
             int hours = 60;
             int dayTime = 1440;
+            //流逝的时间 (分钟)
             int out = DataTool.getTime(file1.getTaskByName(file.getTaskName()).getTaskClass().getTime());
             int dayM = ((day > out)?(day - out):0);
             String dayMs = dayM+" 分钟";
@@ -593,7 +595,7 @@ public class TaskFile {
                 if(dayM / dayTime  >= 1){
                     dayMs = (dayM / dayTime)+" 天";
                 }else{
-                    dayMs = (day / hours)+" 小时";
+                    dayMs = (dayM / hours)+" 小时";
                 }
             }
             player.sendMessage(RsTask.getTask().getLag("repeat-inDay").

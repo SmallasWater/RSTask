@@ -3,11 +3,13 @@ package com.task.utils.tasks;
 
 import cn.nukkit.Player;
 import cn.nukkit.Server;
+import cn.nukkit.command.ConsoleCommandSender;
+import cn.nukkit.level.Level;
+import cn.nukkit.level.Sound;
 import cn.nukkit.utils.Config;
 import com.task.RsTask;
-import com.task.utils.tasks.taskitems.PlayerTask;
-import com.task.utils.tasks.taskitems.PlayerTaskClass;
-import com.task.utils.tasks.taskitems.TaskItem;
+import com.task.utils.ItemIDSunName;
+import com.task.utils.tasks.taskitems.*;
 import com.task.utils.DataTool;
 import com.task.utils.events.PlayerCanInviteTaskEvent;
 import com.task.utils.events.PlayerTaskCloseEvent;
@@ -730,9 +732,117 @@ public class PlayerFile {
             if(player != null) {
                 SuccessTaskEvent event = new SuccessTaskEvent(player, taskName);
                 Server.getInstance().getPluginManager().callEvent(event);
+                if(!event.isCancelled()){
+                    playerSuccessTask(player, taskName,event);
+                }
             }
         }
     }
+
+    private static void playerSuccessTask(Player player,String taskName,SuccessTaskEvent event){
+        TaskFile file = TaskFile.getTask(taskName);
+        int success = 0;
+        if(file != null && player.isOnline()){
+            if(file.getType() == TaskFile.TaskType.CollectItem){
+                TaskItem[] items1 = file.getTaskItem();
+                for(TaskItem item:items1){
+                    ItemClass itemClass = ItemClass.toItem(item);
+                    if(itemClass != null){
+                        itemClass.getItem().setCount(item.getEndCount());
+                        if(DataTool.getCount(player,itemClass) >= itemClass.getItem().getCount()){
+                            player.getInventory().removeItem(itemClass.getItem());
+                        }else{
+                            event.setCancelled();
+                            player.sendMessage(RsTask.getTask().getLag("error-task","§d§l[任务系统]§c出现异常!!!"));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            SuccessItem item;
+            if(PlayerFile.getPlayerFile(player.getName()).isFirst(file)){
+                item = file.getFirstSuccessItem();
+            }else{
+                item = file.getSuccessItem();
+            }
+            if(item.getItem() != null && item.getItem().length > 0){
+                for(ItemClass itemClass:item.getItem()){
+                    if(itemClass != null){
+                        player.getInventory().addItem(itemClass.getItem().clone());
+                        player.sendMessage(RsTask.getTask().getLag("add-item-message")
+                                .replace("%s", ItemIDSunName.getIDByName(itemClass.getItem())).replace("%c",itemClass.getItem().getCount()+""));
+                    }
+
+                }
+            }
+            if(item.getCmd() != null && item.getCmd().length > 0){
+                for(CommandClass commandClass:item.getCmd()){
+                    if(commandClass != null){
+                        Server.getInstance().getCommandMap().dispatch(new ConsoleCommandSender(),commandClass.getCmd().replace("%p",player.getName()));
+                        player.sendMessage(RsTask.getTask().getLag("add-Cmd-message").replace("%s",commandClass.getSendMessage()));
+                    }
+                }
+            }
+            if(RsTask.loadEconomy){
+                if(item.getMoney() > 0){
+                    RsTask.getTask().getLoadMoney().addMoney(player,item.getMoney());
+                    player.sendMessage(RsTask.getTask().getLag("add-money-message")
+                            .replace("%c",item.getMoney()+"").
+                                    replace("%m", RsTask.getTask().getCoinName()));
+                }
+            }
+            if(RsTask.canOpen()) {
+                if(item.getCount() > 0) {
+                    success += item.getCount();
+                }
+            }
+        }
+
+        PlayerFile playerFiles = PlayerFile.getPlayerFile(player.getName());
+        PlayerTask task = playerFiles.getTaskByName(taskName);
+        if(task == null){
+            playerFiles.addTask(taskName);
+            task = playerFiles.getTaskByName(taskName);
+        }
+        initSuccessTask(task,playerFiles,success,player,taskName);
+
+    }
+    private static void initSuccessTask(PlayerTask task,PlayerFile playerFiles,int success,Player player,String taskName){
+        PlayerTaskClass playerTaskClass = task.getTaskClass();
+        TaskFile file;
+        TaskItem[] items = playerTaskClass.getValue();
+        for(TaskItem item:items){
+            item.setEndCount(0);
+        }
+        playerTaskClass.setOpen(false);
+        playerTaskClass.setValue(items);
+        playerTaskClass.setCount(playerTaskClass.getCount()+1);
+        playerTaskClass.setTime(new Date());
+        task.setTaskClass(playerTaskClass);
+        if(RsTask.canOpen()){
+            playerFiles.setCount(playerFiles.getCount() + success);
+        }
+
+        playerFiles.setPlayerTask(task);
+        Level level = player.getLevel();
+        level.addSound(player.getPosition(), Sound.RANDOM_LEVELUP);
+        RsTask.taskNames.remove(taskName);
+        DataTool.spawnFirework(player);
+        file = TaskFile.getTask(taskName);
+        if(file != null){
+            String send = file.getBroadcastMessage().
+                    replace("%p",player.getName()).replace("%s",file.getName());
+            if(file.getMessageType() == 0){
+                Server.getInstance().broadcastMessage(send);
+            }else{
+                player.sendMessage(send);
+            }
+        }
+        playerFiles.toSave();
+
+    }
+
 
 
     private void toSaveConfig(LinkedHashMap<String,Object> maps){
