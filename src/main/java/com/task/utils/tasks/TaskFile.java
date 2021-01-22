@@ -6,6 +6,7 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 
 import cn.nukkit.utils.Config;
+import cn.nukkit.utils.TextFormat;
 import com.task.utils.tasks.taskitems.SuccessItem;
 import com.task.utils.tasks.taskitems.TaskButton;
 import com.task.utils.tasks.taskitems.TaskItem;
@@ -505,6 +506,8 @@ public class TaskFile {
     /** 获取所有任务文件
      * @return 任务类*/
     public static LinkedHashMap<String,TaskFile> getTasks(){
+        int sCount = 0;
+        int errorCount = 0;
         File file = new File(RsTask.getTask().getDataFolder()+"/Tasks");
         LinkedHashMap<String,TaskFile> names = new LinkedHashMap<>();
         File[] files = file.listFiles();
@@ -516,14 +519,16 @@ public class TaskFile {
                     TaskFile file2 = TaskFile.toTask(name);
                     if(file2 != null) {
                         names.put(name,file2);
-                        RsTask.getTask().getLogger().info(name+" 任务加载成功.");
+                        sCount++;
                     }else{
-                        RsTask.getTask().getLogger().info(name+" 任务加载失败.");
+                        errorCount++;
                     }
                 }else{
-                    RsTask.getTask().getLogger().error("无法加载."+file1.getName()+" 文件");
+                    errorCount++;
                 }
             }
+            RsTask.getTask().getLogger().info(TextFormat.colorize('&',"任务加载完成 &a"+sCount+"&r个任务加载成功 &c"+errorCount+"&r个任务加载失败"));
+
         }
         return names;
     }

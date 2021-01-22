@@ -407,7 +407,7 @@ public class PlayerFile {
 
                 //计算冷却时间
             } else {
-                if (last != null && !last.equals("null")) {
+                if (last != null && !"null".equals(last)) {
                     return isSuccessed(last);
                 }else{
                     return true;

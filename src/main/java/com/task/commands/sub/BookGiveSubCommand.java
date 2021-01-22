@@ -26,24 +26,29 @@ public class BookGiveSubCommand extends BaseSubCommand {
 
     @Override
     public boolean execute(CommandSender sender, String label, String[] args) {
-        String taskName = args[0];
-        TaskFile file = TaskFile.getTask(taskName);
-        if(file == null){
-            sender.sendMessage("§c不存在"+args[0]+"任务");
-            return true;
-        }
-        PlayerFile file1 = PlayerFile.getPlayerFile(sender.getName());
-        if(file1.canInvite(file.getTaskName())){
-            ItemBookWritten written = new ItemBookWritten();
-            TaskBook book = new TaskBook(written);
+        if (args.length > 1) {
+            String taskName = args[1];
+            TaskFile file = TaskFile.getTask(taskName);
+            if (file == null) {
+                sender.sendMessage("§c不存在" + args[1] + "任务");
+                return true;
+            }
+            PlayerFile file1 = PlayerFile.getPlayerFile(sender.getName());
+            if (file1.canInvite(file.getTaskName())) {
+                ItemBookWritten written = new ItemBookWritten();
+                TaskBook book = new TaskBook(written);
 
-            book.setTitle(file.getTaskName());
-            book.setCustomName(file.getName());
-            book.writeIn("\n\n\n\n加载中...请再次打开");
-            ((Player) sender).getInventory().setItemInHand(book.toBook().clone());
+                book.setTitle(file.getTaskName());
+                book.setCustomName(file.getName());
+                book.writeIn("\n\n\n\n加载中...请再次打开");
+                ((Player) sender).getInventory().setItemInHand(book.toBook().clone());
+            } else {
+                sender.sendMessage("§c" + args[1] + "任务不可领取");
+                return true;
+            }
+
         }else{
-            sender.sendMessage("§c"+args[0]+"任务不可领取");
-            return true;
+            sender.sendMessage("§c 请填写任务名称");
         }
         return true;
     }
