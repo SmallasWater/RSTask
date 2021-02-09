@@ -141,7 +141,7 @@ public class SuccessItem {
                         }
                     }
                 }
-                if(tag.equals("Cmd")){
+                if("Cmd".equals(tag)){
                     Object o = map.get(tag);
                     if(o instanceof List) {
                         commandClasses = new CommandClass[((List) o).size()];

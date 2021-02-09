@@ -42,12 +42,12 @@ public class PlayerTaskClass {
 
 
     public LinkedHashMap<String,Object> toSaveConfig(){
-        LinkedHashMap<String,Object> TaskItem = new LinkedHashMap<>();
+        LinkedHashMap<String,Object> taskItem = new LinkedHashMap<>();
         for(TaskItem item:value){
-            TaskItem.putAll(item.toSaveConfig());
+            taskItem.putAll(item.toSaveConfig());
         }
         LinkedHashMap<String,Object> t = new LinkedHashMap<>();
-        t.put("load",TaskItem);
+        t.put("load",taskItem);
         t.put("open",open);
         t.put("time", DataTool.toDateString(time));
         t.put("count",count);

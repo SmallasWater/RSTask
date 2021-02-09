@@ -307,10 +307,8 @@ public class ListerEvents implements Listener{
             if(file1.issetTask(file)){
                 i++;
                 if(!file1.delTask(file.getTaskName())){
-                    file1.toSave();
                     Server.getInstance().getLogger().info("[任务系统] 玩家"+playerName+"移除"+file.getTaskName()+"任务失败");
                 }else{
-                    file1.toSave();
                     Server.getInstance().getLogger().info("[任务系统] 玩家"+playerName+"移除"+file.getTaskName()+"任务成功");
                 }
             }

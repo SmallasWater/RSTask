@@ -260,7 +260,6 @@ public class PlayerFile {
             }else{
                 delTask(taskName);
             }
-            toSave();
             TaskFile file1 = TaskFile.getTask(taskName);
             if(file1 != null) {
                 PlayerTaskCloseEvent event = new PlayerTaskCloseEvent(this, file1);
@@ -839,7 +838,6 @@ public class PlayerFile {
                 player.sendMessage(send);
             }
         }
-        playerFiles.toSave();
 
     }
 
@@ -851,10 +849,14 @@ public class PlayerFile {
         config.save();
     }
 
-    public void toSave(){
+    public boolean toSave(){
         Config config = RsTask.getTask().getPlayerConfig(playerName);
+        if(defaultConfig().isEmpty()){
+            return false;
+        }
         config.setAll(defaultConfig());
         config.save();
+        return true;
     }
 
 

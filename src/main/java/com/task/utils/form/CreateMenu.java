@@ -318,7 +318,7 @@ public class CreateMenu {
         Map map1;
         for(int i = 0;i<map.size();i++){
              map1 = (Map) map.get(i+"");
-            list1.add(map1.get("名称").toString());
+             list1.add(map1.get("名称").toString());
         }
         custom.addElement(new ElementDropdown("请选择任务分组",list1));
         custom.addElement(new ElementInput("请输入任务难度(整数)","例如: 1","1"));

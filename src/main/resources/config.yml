@@ -10,7 +10,7 @@
 # 以下可以自定义按键名称与路径 按键数量为任务难度
 
 #配置文件版本 跟插件版本不挂钩
-version: "1.5.1"
+version: "1.5.2"
 
 #作用于任务分组
 自定义图片路径:
@@ -92,6 +92,12 @@ enable-Economy: true
 
 # 支持 EconomyAPI Money ,PlayerPoint
 使用经济核心: EconomyAPI
+
+#单位： 分钟
+#玩家任务自动保存设置
+auto-save-task:
+ open: true
+ time: 5
 
 
 

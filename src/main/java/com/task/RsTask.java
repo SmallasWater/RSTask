@@ -9,6 +9,7 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
 import com.task.commands.*;
+import com.task.utils.task.AutoSaveFileTask;
 import com.task.utils.task.ChunkPlayerInventoryBookTask;
 import com.task.utils.task.ChunkTaskTask;
 import com.task.utils.tasks.TaskFile;
@@ -32,7 +33,7 @@ import java.util.*;
  */
 public class RsTask extends PluginBase{
 
-    private static final String CONFIG_VERSION = "1.5.1";
+    private static final String CONFIG_VERSION = "1.5.2";
     private static RsTask task;
 
     public static LinkedList<String> taskNames = new LinkedList<>();
@@ -102,7 +103,9 @@ public class RsTask extends PluginBase{
         }
         this.getServer().getScheduler().scheduleRepeatingTask(new ChunkTaskTask(this),20);
         this.getServer().getScheduler().scheduleRepeatingTask(new ChunkPlayerInventoryBookTask(this),20);
-
+        if(getConfig().getBoolean("auto-save-task.open")){
+            Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this,new AutoSaveFileTask(this),(20 * getConfig().getInt("auto-save-task.time")) * 60,20);
+        }
 
     }
 
@@ -560,11 +563,6 @@ public class RsTask extends PluginBase{
 
     }
 
-    public void savePlayerFile(){
-        for(PlayerFile player:playerFiles.values()){
-            player.toSave();
-        }
-    }
     @Override
     public void onDisable() {
         for(TaskFile file:tasks.values()){
