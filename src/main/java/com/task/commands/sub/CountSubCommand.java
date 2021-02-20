@@ -7,7 +7,7 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.TextFormat;
 import com.task.commands.base.BaseSubCommand;
-import com.task.utils.tasks.PlayerFile;
+import com.task.tasks.PlayerFile;
 
 /**
  * 设置玩家积分子指令

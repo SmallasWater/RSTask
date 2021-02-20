@@ -1,12 +1,9 @@
-package com.task.utils.events;
+package com.task.events;
 
 
 import cn.nukkit.Player;
-import cn.nukkit.event.Cancellable;
-import cn.nukkit.event.HandlerList;
-import cn.nukkit.event.player.PlayerEvent;
-import com.task.utils.events.base.PlayerTaskEvent;
-import com.task.utils.tasks.TaskFile;
+import com.task.events.base.PlayerTaskEvent;
+import com.task.tasks.TaskFile;
 
 /**
  * 玩家领取任务事件

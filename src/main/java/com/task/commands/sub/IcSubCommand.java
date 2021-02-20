@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
 import com.task.commands.base.BaseSubCommand;
-import com.task.utils.form.CreateMenu;
+import com.task.form.CreateMenu;
 
 /**
  * 创建任务子指令

@@ -1,4 +1,4 @@
-package com.task.utils.tasks.taskitems;
+package com.task.tasks.taskitems;
 
 
 /**

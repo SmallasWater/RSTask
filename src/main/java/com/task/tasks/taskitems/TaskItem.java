@@ -1,4 +1,4 @@
-package com.task.utils.tasks.taskitems;
+package com.task.tasks.taskitems;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

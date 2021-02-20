@@ -1,11 +1,7 @@
-package com.task.utils.events;
+package com.task.events;
 
-import cn.nukkit.event.Cancellable;
-import cn.nukkit.event.Event;
-import cn.nukkit.event.HandlerList;
-
-import com.task.utils.events.base.TaskEvent;
-import com.task.utils.tasks.TaskFile;
+import com.task.events.base.TaskEvent;
+import com.task.tasks.TaskFile;
 
 /**
  * 判断是否可领取的时候触发事件

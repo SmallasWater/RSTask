@@ -1,4 +1,4 @@
-package com.task.utils.form;
+package com.task.form;
 
 
 import cn.nukkit.Player;
@@ -10,14 +10,14 @@ import cn.nukkit.form.window.FormWindowSimple;
 import com.task.RsTask;
 import com.task.utils.ItemIDSunName;
 import com.task.utils.task.CollectItemTask;
-import com.task.utils.tasks.DayTime;
-import com.task.utils.tasks.TaskFile;
-import com.task.utils.tasks.taskitems.PlayerTask;
-import com.task.utils.tasks.taskitems.PlayerTaskClass;
-import com.task.utils.tasks.taskitems.SuccessItem;
-import com.task.utils.tasks.taskitems.TaskItem;
+import com.task.utils.DayTime;
+import com.task.tasks.TaskFile;
+import com.task.tasks.taskitems.PlayerTask;
+import com.task.tasks.taskitems.PlayerTaskClass;
+import com.task.tasks.taskitems.SuccessItem;
+import com.task.tasks.taskitems.TaskItem;
 import com.task.utils.DataTool;
-import com.task.utils.tasks.PlayerFile;
+import com.task.tasks.PlayerFile;
 
 import java.util.*;
 

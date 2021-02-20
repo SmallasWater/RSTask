@@ -1,4 +1,4 @@
-package com.task.utils.tasks;
+package com.task.tasks;
 
 
 import cn.nukkit.Player;
@@ -9,12 +9,12 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.utils.Config;
 import com.task.RsTask;
 import com.task.utils.ItemIDSunName;
-import com.task.utils.tasks.taskitems.*;
+import com.task.tasks.taskitems.*;
 import com.task.utils.DataTool;
-import com.task.utils.events.PlayerCanInviteTaskEvent;
-import com.task.utils.events.PlayerTaskCloseEvent;
-import com.task.utils.events.SuccessTaskEvent;
-import com.task.utils.events.UseTaskEvent;
+import com.task.events.PlayerCanInviteTaskEvent;
+import com.task.events.PlayerTaskCloseEvent;
+import com.task.events.SuccessTaskEvent;
+import com.task.events.UseTaskEvent;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -724,9 +724,14 @@ public class PlayerFile {
 //        toSaveConfig(defaultConfig(playerTasks,value));
     }
 
-
     /** 玩家完成任务 */
-    public static void givePlayerSuccessItems(Player player, String taskName){
+    public static void givePlayerSuccessItems(Player player, String taskName,boolean pass){
+        if(!pass){
+            PlayerFile file = PlayerFile.getPlayerFile(player.getName());
+            if(!file.isSuccess(taskName) ){
+                return;
+            }
+        }
         if(TaskFile.isFileTask(taskName)){
             if(player != null) {
                 SuccessTaskEvent event = new SuccessTaskEvent(player, taskName);
@@ -738,7 +743,12 @@ public class PlayerFile {
         }
     }
 
-    private static void playerSuccessTask(Player player,String taskName,SuccessTaskEvent event){
+    /** 玩家完成任务 */
+    public static void givePlayerSuccessItems(Player player, String taskName){
+        givePlayerSuccessItems(player, taskName,false);
+    }
+
+    private synchronized static void playerSuccessTask(Player player,String taskName,SuccessTaskEvent event){
         TaskFile file = TaskFile.getTask(taskName);
         int success = 0;
         if(file != null && player.isOnline()){

@@ -5,11 +5,10 @@ import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.scheduler.PluginTask;
-import cn.nukkit.scheduler.Task;
 import com.task.RsTask;
-import com.task.utils.tasks.taskitems.TaskBook;
-import com.task.utils.tasks.taskitems.PlayerTask;
-import com.task.utils.tasks.PlayerFile;
+import com.task.tasks.taskitems.TaskBook;
+import com.task.tasks.taskitems.PlayerTask;
+import com.task.tasks.PlayerFile;
 
 /**
  * 检查玩家背包任务书

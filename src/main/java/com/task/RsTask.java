@@ -12,14 +12,14 @@ import com.task.commands.*;
 import com.task.utils.task.AutoSaveFileTask;
 import com.task.utils.task.ChunkPlayerInventoryBookTask;
 import com.task.utils.task.ChunkTaskTask;
-import com.task.utils.tasks.TaskFile;
-import com.task.utils.tasks.taskitems.TaskItem;
+import com.task.tasks.TaskFile;
+import com.task.tasks.taskitems.TaskItem;
 import com.task.utils.DataTool;
 import com.task.utils.LoadMoney;
 import com.task.utils.task.ListerEvents;
-import com.task.utils.tasks.taskitems.ItemClass;
-import com.task.utils.tasks.PlayerFile;
-import com.task.utils.form.ListenerMenu;
+import com.task.tasks.taskitems.ItemClass;
+import com.task.tasks.PlayerFile;
+import com.task.form.ListenerMenu;
 import org.jline.utils.Log;
 import updata.AutoData;
 
@@ -104,7 +104,7 @@ public class RsTask extends PluginBase{
         this.getServer().getScheduler().scheduleRepeatingTask(new ChunkTaskTask(this),20);
         this.getServer().getScheduler().scheduleRepeatingTask(new ChunkPlayerInventoryBookTask(this),20);
         if(getConfig().getBoolean("auto-save-task.open")){
-            Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this,new AutoSaveFileTask(this),(20 * getConfig().getInt("auto-save-task.time")) * 60,20);
+            Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this,new AutoSaveFileTask(this),(20 * getConfig().getInt("auto-save-task.time")) * 60,(20 * getConfig().getInt("auto-save-task.time")) * 60);
         }
 
     }

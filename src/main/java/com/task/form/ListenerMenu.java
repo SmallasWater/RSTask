@@ -1,4 +1,4 @@
-package com.task.utils.form;
+package com.task.form;
 
 
 import cn.nukkit.Player;
@@ -12,16 +12,16 @@ import cn.nukkit.network.protocol.InventoryTransactionPacket;
 import cn.nukkit.network.protocol.ModalFormResponsePacket;
 import com.task.RsTask;
 import com.task.utils.task.CollectItemTask;
-import com.task.utils.tasks.PlayerFile;
-import com.task.utils.tasks.TaskFile;
-import com.task.utils.tasks.taskitems.SuccessItem;
-import com.task.utils.tasks.taskitems.TaskBook;
-import com.task.utils.tasks.taskitems.TaskItem;
+import com.task.tasks.PlayerFile;
+import com.task.tasks.TaskFile;
+import com.task.tasks.taskitems.SuccessItem;
+import com.task.tasks.taskitems.TaskBook;
+import com.task.tasks.taskitems.TaskItem;
 import com.task.utils.DataTool;
-import com.task.utils.events.PlayerGiveUpTaskEvent;
+import com.task.events.PlayerGiveUpTaskEvent;
 
-import com.task.utils.events.PlayerClickTaskEvent;
-import com.task.utils.events.PlayerOpenBookEvent;
+import com.task.events.PlayerClickTaskEvent;
+import com.task.events.PlayerOpenBookEvent;
 
 
 

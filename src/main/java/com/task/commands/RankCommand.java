@@ -2,7 +2,7 @@ package com.task.commands;
 
 import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
-import com.task.utils.form.CreateMenu;
+import com.task.form.CreateMenu;
 import com.task.commands.base.BaseCommand;
 
 /**

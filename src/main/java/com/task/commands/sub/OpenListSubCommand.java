@@ -8,8 +8,7 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.TextFormat;
 import com.task.RsTask;
 import com.task.utils.DataTool;
-import com.task.utils.form.CreateMenu;
-import com.task.utils.tasks.PlayerFile;
+import com.task.form.CreateMenu;
 
 
 /**
@@ -37,7 +36,9 @@ public class OpenListSubCommand extends OpenTaskSubCommand{
                 try {
                     int group = Integer.parseInt(list);
                     if(DataTool.existsGroup(group)) {
-                        if (LaTestSubCommand.canOpenGroup(sender, playerName, player, group)) return true;
+                        if (LaTestSubCommand.canOpenGroup(sender, playerName, player, group)) {
+                            return true;
+                        }
                         CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
                     }else{
                         sender.sendMessage(TextFormat.RED+"不存在分组: "+group);

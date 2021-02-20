@@ -4,7 +4,6 @@ package com.task.utils.task;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.block.Block;
-import cn.nukkit.command.ConsoleCommandSender;
 import cn.nukkit.entity.Entity;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.EventPriority;
@@ -20,16 +19,14 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import com.task.RsTask;
 import com.task.utils.API;
-import com.task.utils.ItemIDSunName;
-import com.task.utils.events.*;
-import com.task.utils.form.CreateMenu;
-import com.task.utils.tasks.PlayerFile;
-import com.task.utils.tasks.TaskFile;
+import com.task.events.*;
+import com.task.form.CreateMenu;
+import com.task.tasks.PlayerFile;
+import com.task.tasks.TaskFile;
 import com.task.utils.DataTool;
 
-import com.task.utils.tasks.taskitems.*;
+import com.task.tasks.taskitems.*;
 
-import java.util.Date;
 import java.util.LinkedList;
 
 /**
@@ -166,12 +163,13 @@ public class ListerEvents implements Listener{
                                     .getStar()+"").replace("%s",task.getTaskFile().getName()).replace("\\n","\n");
                     DataTool.sendMessage(player,send);
                 }
-                if(RsTask.canSuccess){
-                    PlayerFile.givePlayerSuccessItems(player,task.getTaskName());
-                }
             }
         }
-
+        if(RsTask.canSuccess){
+            if(file.isSuccess(task.getTaskFile())) {
+                PlayerFile.givePlayerSuccessItems(player, task.getTaskName());
+            }
+        }
 
     }
 

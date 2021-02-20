@@ -1,4 +1,4 @@
-package com.task.utils.events;
+package com.task.events;
 
 
 import cn.nukkit.Player;

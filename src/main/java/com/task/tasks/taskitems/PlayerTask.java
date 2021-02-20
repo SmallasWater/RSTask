@@ -1,6 +1,8 @@
-package com.task.utils.tasks.taskitems;
+package com.task.tasks.taskitems;
 
-import com.task.utils.tasks.TaskFile;
+
+
+import com.task.tasks.TaskFile;
 
 import java.util.*;
 

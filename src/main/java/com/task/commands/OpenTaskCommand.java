@@ -4,9 +4,9 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import com.task.commands.base.BaseCommand;
-import com.task.utils.events.PlayerClickTaskEvent;
-import com.task.utils.form.CreateMenu;
-import com.task.utils.tasks.TaskFile;
+import com.task.events.PlayerClickTaskEvent;
+import com.task.form.CreateMenu;
+import com.task.tasks.TaskFile;
 
 /**
  * 玩家打开任务主指令

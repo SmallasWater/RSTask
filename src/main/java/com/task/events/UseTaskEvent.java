@@ -1,4 +1,4 @@
-package com.task.utils.events;
+package com.task.events;
 
 
 import cn.nukkit.Player;
@@ -6,7 +6,7 @@ import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.player.PlayerEvent;
 
-import com.task.utils.tasks.taskitems.PlayerTask;
+import com.task.tasks.taskitems.PlayerTask;
 
 /** 玩家执行任务事件
  * @author SmallasWater*/

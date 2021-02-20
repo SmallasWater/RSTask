@@ -1,4 +1,4 @@
-package com.task.utils.tasks.taskitems;
+package com.task.tasks.taskitems;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
@@ -6,9 +6,9 @@ import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.StringTag;
 import com.task.RsTask;
-import com.task.utils.tasks.TaskFile;
-import com.task.utils.tasks.PlayerFile;
-import com.task.utils.form.CreateMenu;
+import com.task.tasks.TaskFile;
+import com.task.tasks.PlayerFile;
+import com.task.form.CreateMenu;
 
 import java.util.*;
 
@@ -93,27 +93,26 @@ public class TaskBook {
         cleanAll();
         if(file != null){
             StringBuilder two = new StringBuilder();
-            StringBuilder one = new StringBuilder();
-            one.append(CreateMenu.getTitles(player, file)).append("§r\n");
-            one.append(RsTask.getTask().getLag("task-speed")).append("§r \n");
+            StringBuilder three = new StringBuilder();
+            two.append(RsTask.getTask().getLag("task-speed")).append("§r \n");
             TaskItem[] items = file.getTaskItem();
             if(items.length > 0){
                 for(String s: CreateMenu.toTaskItemString(items,player)){
-                    one.append(s);
+                    two.append(s);
                 }
             }else{
-                one.append(RsTask.getTask().getLag("notTasks")).append("§r\n");
+                two.append(RsTask.getTask().getLag("notTasks")).append("§r\n");
             }
             SuccessItem item = file.getSuccessItem();
             if(PlayerFile.getPlayerFile(player.getName()).isFirst(file)){
                 item = file.getFirstSuccessItem();
             }
-            two.append("\n").append(RsTask.getTask().getLag("success-item")).append("\n");
+            three.append("\n").append(RsTask.getTask().getLag("success-item")).append("\n");
             for(StringBuilder s:item.toList()){
-                two.append("§r").append(s.toString()).append("\n");
+                three.append("§r").append(s.toString()).append("\n");
             }
-            two.append("\n\n\n§c(如果内容不符请重新打开或执行/cbook up)");
-            writeIn((one.toString()).replace("§e","§r")).writeIn(two.toString().replace("§e","§r"));
+            three.append("\n\n\n§c(如果内容不符请重新打开或执行/cbook up)");
+            writeIn((CreateMenu.getTitles(player, file) + "§r\n").replace("§e","§r")).writeIn(two.toString().replace("§e","§r")).writeIn(three.toString().replace("§e","§r"));
         }
     }
 

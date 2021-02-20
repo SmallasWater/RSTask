@@ -1,21 +1,19 @@
-package com.task.utils.events;
+package com.task.events;
 
-import cn.nukkit.event.Event;
-import cn.nukkit.event.HandlerList;
-import com.task.utils.events.base.TaskEvent;
-import com.task.utils.tasks.PlayerFile;
-import com.task.utils.tasks.TaskFile;
+import com.task.events.base.TaskEvent;
+import com.task.tasks.PlayerFile;
+import com.task.tasks.TaskFile;
 
 /**
- * 任务超时事件
+ * 玩家放弃任务事件
  * @author SmallasWater
  */
-public class TaskTimeOutEvent extends TaskEvent {
+public class PlayerTaskCloseEvent extends TaskEvent {
 
 
     private final PlayerFile player;
 
-    public TaskTimeOutEvent(PlayerFile player, TaskFile file){
+    public PlayerTaskCloseEvent(PlayerFile player, TaskFile file){
         super(file);
         this.player = player;
     }

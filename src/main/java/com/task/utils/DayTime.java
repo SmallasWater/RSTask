@@ -1,4 +1,4 @@
-package com.task.utils.tasks;
+package com.task.utils;
 
 /**
  * @author SmallasWater

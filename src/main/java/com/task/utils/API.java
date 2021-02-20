@@ -4,12 +4,12 @@ import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.item.Item;
 import com.task.RsTask;
-import com.task.utils.events.DelTaskEvent;
-import com.task.utils.tasks.TaskFile;
-import com.task.utils.tasks.taskitems.ItemClass;
-import com.task.utils.tasks.taskitems.PlayerTask;
-import com.task.utils.tasks.PlayerFile;
-import com.task.utils.events.PlayerClickTaskEvent;
+import com.task.events.DelTaskEvent;
+import com.task.tasks.TaskFile;
+import com.task.tasks.taskitems.ItemClass;
+import com.task.tasks.taskitems.PlayerTask;
+import com.task.tasks.PlayerFile;
+import com.task.events.PlayerClickTaskEvent;
 import com.task.utils.task.ListerEvents;
 
 import java.util.LinkedList;

@@ -3,10 +3,10 @@ package com.task.commands.sub;
 import cn.nukkit.Server;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.command.data.CommandParameter;
-import com.task.utils.events.DelTaskEvent;
+import com.task.events.DelTaskEvent;
 import com.task.commands.base.BaseSubCommand;
 import com.task.utils.DataTool;
-import com.task.utils.tasks.TaskFile;
+import com.task.tasks.TaskFile;
 
 /**
  * 删除玩家任务指令
