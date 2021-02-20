@@ -6,7 +6,7 @@ import cn.nukkit.command.data.CommandParameter;
 import com.task.events.DelTaskEvent;
 import com.task.commands.base.BaseSubCommand;
 import com.task.utils.DataTool;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.TaskFile;
 
 /**
  * 删除玩家任务指令

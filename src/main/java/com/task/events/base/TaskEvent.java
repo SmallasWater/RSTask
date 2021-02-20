@@ -3,7 +3,7 @@ package com.task.events.base;
 import cn.nukkit.event.Cancellable;
 import cn.nukkit.event.Event;
 import cn.nukkit.event.HandlerList;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.TaskFile;
 
 /**
  * @author SmallasWater

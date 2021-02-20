@@ -7,7 +7,7 @@ import cn.nukkit.command.data.CommandParamType;
 import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.utils.TextFormat;
 import com.task.commands.base.BaseSubCommand;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.TaskFile;
 import com.task.utils.DataTool;
 import com.task.events.PlayerClickTaskEvent;
 

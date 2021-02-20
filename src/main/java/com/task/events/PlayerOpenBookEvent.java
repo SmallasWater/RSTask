@@ -3,7 +3,7 @@ package com.task.events;
 import cn.nukkit.Player;
 import cn.nukkit.event.HandlerList;
 import cn.nukkit.event.player.PlayerEvent;
-import com.task.tasks.taskitems.TaskBook;
+import com.task.utils.tasks.taskitems.TaskBook;
 
 /**
  * 玩家打开任务书事件

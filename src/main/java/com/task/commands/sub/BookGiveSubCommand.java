@@ -6,9 +6,9 @@ import cn.nukkit.command.data.CommandParameter;
 import cn.nukkit.item.ItemBookWritten;
 import com.task.commands.base.BaseSubCommand;
 import com.task.utils.DataTool;
-import com.task.tasks.PlayerFile;
-import com.task.tasks.TaskFile;
-import com.task.tasks.taskitems.TaskBook;
+import com.task.utils.tasks.PlayerFile;
+import com.task.utils.tasks.TaskFile;
+import com.task.utils.tasks.taskitems.TaskBook;
 
 /**
  * 给予玩家书本子指令

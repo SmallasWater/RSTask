@@ -4,7 +4,7 @@ import cn.nukkit.Player;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
 import com.task.RsTask;
-import com.task.tasks.taskitems.ItemClass;
+import com.task.utils.tasks.taskitems.ItemClass;
 import com.task.commands.base.BaseCommand;
 
 /**

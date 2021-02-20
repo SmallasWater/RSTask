@@ -1,4 +1,4 @@
-package com.task.tasks;
+package com.task.utils.tasks;
 
 
 
@@ -8,9 +8,9 @@ import cn.nukkit.Server;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
 import com.task.events.PlayerAddTaskEvent;
-import com.task.tasks.taskitems.SuccessItem;
-import com.task.tasks.taskitems.TaskButton;
-import com.task.tasks.taskitems.TaskItem;
+import com.task.utils.tasks.taskitems.SuccessItem;
+import com.task.utils.tasks.taskitems.TaskButton;
+import com.task.utils.tasks.taskitems.TaskItem;
 import com.task.RsTask;
 import com.task.utils.DataTool;
 

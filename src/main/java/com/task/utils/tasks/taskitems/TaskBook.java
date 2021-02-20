@@ -1,4 +1,4 @@
-package com.task.tasks.taskitems;
+package com.task.utils.tasks.taskitems;
 
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
@@ -6,8 +6,8 @@ import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.StringTag;
 import com.task.RsTask;
-import com.task.tasks.TaskFile;
-import com.task.tasks.PlayerFile;
+import com.task.utils.tasks.TaskFile;
+import com.task.utils.tasks.PlayerFile;
 import com.task.form.CreateMenu;
 
 import java.util.*;

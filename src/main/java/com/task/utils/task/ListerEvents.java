@@ -21,11 +21,11 @@ import com.task.RsTask;
 import com.task.utils.API;
 import com.task.events.*;
 import com.task.form.CreateMenu;
-import com.task.tasks.PlayerFile;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.PlayerFile;
+import com.task.utils.tasks.TaskFile;
 import com.task.utils.DataTool;
 
-import com.task.tasks.taskitems.*;
+import com.task.utils.tasks.taskitems.*;
 
 import java.util.LinkedList;
 

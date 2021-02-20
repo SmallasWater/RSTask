@@ -1,7 +1,7 @@
 package com.task.events;
 
 import com.task.events.base.TaskEvent;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.TaskFile;
 
 /**
  * 判断是否可领取的时候触发事件

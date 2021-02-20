@@ -1,4 +1,4 @@
-package com.task.tasks;
+package com.task.utils.tasks;
 
 
 import cn.nukkit.Player;
@@ -9,7 +9,7 @@ import cn.nukkit.level.Sound;
 import cn.nukkit.utils.Config;
 import com.task.RsTask;
 import com.task.utils.ItemIDSunName;
-import com.task.tasks.taskitems.*;
+import com.task.utils.tasks.taskitems.*;
 import com.task.utils.DataTool;
 import com.task.events.PlayerCanInviteTaskEvent;
 import com.task.events.PlayerTaskCloseEvent;

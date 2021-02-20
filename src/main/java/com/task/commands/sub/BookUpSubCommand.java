@@ -10,7 +10,7 @@ import com.task.RsTask;
 import com.task.commands.base.BaseSubCommand;
 import com.task.events.PlayerOpenBookEvent;
 import com.task.utils.task.CollectItemTask;
-import com.task.tasks.taskitems.TaskBook;
+import com.task.utils.tasks.taskitems.TaskBook;
 
 
 /**

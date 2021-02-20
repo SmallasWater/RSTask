@@ -1,8 +1,8 @@
-package com.task.tasks.taskitems;
+package com.task.utils.tasks.taskitems;
 
 
 import com.task.utils.DataTool;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.TaskFile;
 
 import java.util.Date;
 import java.util.LinkedHashMap;

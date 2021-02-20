@@ -1,8 +1,8 @@
 package com.task.events;
 
 import com.task.events.base.TaskEvent;
-import com.task.tasks.PlayerFile;
-import com.task.tasks.TaskFile;
+import com.task.utils.tasks.PlayerFile;
+import com.task.utils.tasks.TaskFile;
 
 /**
  * 任务超时事件

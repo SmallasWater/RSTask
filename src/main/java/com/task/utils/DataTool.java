@@ -16,8 +16,8 @@ import cn.nukkit.utils.DyeColor;
 import com.google.gson.reflect.TypeToken;
 import com.task.RsTask;
 import com.task.events.CreateTaskEvent;
-import com.task.tasks.TaskFile;
-import com.task.tasks.taskitems.ItemClass;
+import com.task.utils.tasks.TaskFile;
+import com.task.utils.tasks.taskitems.ItemClass;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

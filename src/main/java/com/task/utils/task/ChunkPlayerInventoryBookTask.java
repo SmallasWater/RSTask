@@ -6,9 +6,9 @@ import cn.nukkit.item.Item;
 import cn.nukkit.item.ItemBookWritten;
 import cn.nukkit.scheduler.PluginTask;
 import com.task.RsTask;
-import com.task.tasks.taskitems.TaskBook;
-import com.task.tasks.taskitems.PlayerTask;
-import com.task.tasks.PlayerFile;
+import com.task.utils.tasks.taskitems.TaskBook;
+import com.task.utils.tasks.taskitems.PlayerTask;
+import com.task.utils.tasks.PlayerFile;
 
 /**
  * 检查玩家背包任务书
