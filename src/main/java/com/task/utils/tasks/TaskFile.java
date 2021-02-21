@@ -575,7 +575,7 @@ public class TaskFile {
         }
         if((file.getLastTask() != null && !"null".equals(file.getLastTask()) && !"".equals(file.getLastTask()))){
             if(!file1.isSuccessed(file.getLastTask())){
-                player.sendMessage(RsTask.getTask().getLag("useLastTask").replace("%s",file.getName()));
+                player.sendMessage(RsTask.getTask().getLag("useLastTask").replace("%s",file.getLastTask()));
                 return false;
             }
         }

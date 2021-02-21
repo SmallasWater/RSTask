@@ -8,7 +8,7 @@ import cn.nukkit.event.player.PlayerEvent;
 
 /** 玩家完成任务事件
  * @author SmallasWater*/
-public class SuccessTaskEvent extends PlayerEvent implements Cancellable {
+public class SuccessTaskEvent extends PlayerEvent {
     private static final HandlerList HANDLERS = new HandlerList();
 
     public static HandlerList getHandlers() {

@@ -559,6 +559,15 @@ public class PlayerFile {
     }
 
 
+    public LinkedList<TaskFile> getRunningTasks(){
+        LinkedList<TaskFile> tasks = new LinkedList<>();
+        for(PlayerTask task:playerTasks) {
+            if(task.getTaskClass().getOpen()){
+                tasks.add(task.getTaskFile());
+            }
+        }
+        return tasks;
+    }
 
 
     public LinkedList<PlayerTask> getTasksByType(PlayerTaskType taskType, int level){
@@ -591,7 +600,7 @@ public class PlayerFile {
     private LinkedList<PlayerTask> getTasksByType(PlayerTaskType taskType){
         LinkedList<PlayerTask> tasks = new LinkedList<>();
         for(PlayerTask task:playerTasks) {
-            if(getTaskType(task.getTaskFile())==taskType){
+            if(getTaskType(task.getTaskFile()) == taskType){
                 tasks.add(task);
             }
         }
@@ -734,11 +743,7 @@ public class PlayerFile {
         }
         if(TaskFile.isFileTask(taskName)){
             if(player != null) {
-                SuccessTaskEvent event = new SuccessTaskEvent(player, taskName);
-                Server.getInstance().getPluginManager().callEvent(event);
-                if(!event.isCancelled()){
-                    playerSuccessTask(player, taskName,event);
-                }
+                playerSuccessTask(player, taskName);
             }
         }
     }
@@ -748,7 +753,7 @@ public class PlayerFile {
         givePlayerSuccessItems(player, taskName,false);
     }
 
-    private synchronized static void playerSuccessTask(Player player,String taskName,SuccessTaskEvent event){
+    private synchronized static void playerSuccessTask(Player player,String taskName){
         TaskFile file = TaskFile.getTask(taskName);
         int success = 0;
         if(file != null && player.isOnline()){
@@ -761,7 +766,6 @@ public class PlayerFile {
                         if(DataTool.getCount(player,itemClass) >= itemClass.getItem().getCount()){
                             player.getInventory().removeItem(itemClass.getItem());
                         }else{
-                            event.setCancelled();
                             player.sendMessage(RsTask.getTask().getLag("error-task","§d§l[任务系统]§c出现异常!!!"));
                             return;
                         }
@@ -848,6 +852,8 @@ public class PlayerFile {
                 player.sendMessage(send);
             }
         }
+        SuccessTaskEvent event = new SuccessTaskEvent(player, taskName);
+        Server.getInstance().getPluginManager().callEvent(event);
 
     }
 

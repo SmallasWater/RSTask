@@ -41,6 +41,7 @@ public class OpenListSubCommand extends OpenTaskSubCommand{
                         }
                         CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
                     }else{
+
                         sender.sendMessage(TextFormat.RED+"不存在分组: "+group);
                         return true;
                     }

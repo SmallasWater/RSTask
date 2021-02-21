@@ -35,6 +35,8 @@ public class CreateMenu {
 
     public static RsTask task = RsTask.getTask();
 
+    public static LinkedHashMap<Player,LinkedList<TaskFile>> runTaskFiles = new LinkedHashMap<>();
+
 
     /**
      * 给玩家发送任务主界面GUI
@@ -79,18 +81,21 @@ public class CreateMenu {
         send(player,simple, MENU);
     }
 
-
     /**
-     * 给玩家发送任务列表GUI
-     * @param player 玩家
-     * @param group 分组
+     * 发送正在进行任务GUI
      * */
-    public static void sendTaskList(Player player, int group){
-        LinkedList<TaskFile> taskFiles = TaskFile.getDifficultyTasks(group);
-        PlayerFile playerFiles = PlayerFile.getPlayerFile(player.getName());
-        FormWindowSimple simple = new FormWindowSimple(DataTool.getGroupName(group),
-                RsTask.getTask().getLag("sendMenu-content"));
+    public static void sendMenuRunningTaskList(Player player){
+        PlayerFile file = PlayerFile.getPlayerFile(player.getName());
+        LinkedList<TaskFile> taskFiles = file.getRunningTasks();
+        runTaskFiles.put(player,taskFiles);
+        FormWindowSimple simple = makeSimpleByTasks(player,taskFiles,RsTask.getTask().getLag("running-task-menu-title"),"");
+        player.showFormWindow(simple,INVITE);
 
+    }
+
+    private static FormWindowSimple makeSimpleByTasks(Player player,LinkedList<TaskFile> taskFiles,String title,String context){
+        PlayerFile playerFiles = PlayerFile.getPlayerFile(player.getName());
+        FormWindowSimple simple = new FormWindowSimple(title,context);
         for(TaskFile file:taskFiles) {
             if(file != null){
                 String s = "";
@@ -124,8 +129,8 @@ public class CreateMenu {
                     case isSuccess_noInvite:
                         s = (RsTask.getTask().getLag("cannot-receive"));
                         break;
-                        default:
-                            break;
+                    default:
+                        break;
                 }
                 ElementButton button = file.getButton().toButton();
                 button.setText(file.getName()+ s);
@@ -135,6 +140,17 @@ public class CreateMenu {
                 }
             }
         }
+        return simple;
+    }
+
+    /**
+     * 给玩家发送任务列表GUI
+     * @param player 玩家
+     * @param group 分组
+     * */
+    public static void sendTaskList(Player player, int group){
+        LinkedList<TaskFile> taskFiles = TaskFile.getDifficultyTasks(group);
+        FormWindowSimple simple = makeSimpleByTasks(player,taskFiles,DataTool.getGroupName(group),RsTask.getTask().getLag("sendMenu-content"));
         send(player,simple, TASKS);
     }
 

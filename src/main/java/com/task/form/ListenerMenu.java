@@ -32,6 +32,7 @@ import java.util.LinkedList;
  */
 public class ListenerMenu implements Listener{
 
+    public LinkedList<Player> onRunning = new LinkedList<>();
     @EventHandler
     public void getUI(DataPacketReceiveEvent event){
         String data;
@@ -57,6 +58,19 @@ public class ListenerMenu implements Listener{
                     }
                     RsTask.getClickStar.put(player,Integer.parseInt(data));
                     CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
+                    break;
+                case CreateMenu.INVITE:
+                    if("null".equals(data)) {
+                        return;
+                    }
+                    if(CreateMenu.runTaskFiles.containsKey(player)){
+                        LinkedList<TaskFile> fileList = CreateMenu.runTaskFiles.get(player);
+                        onRunning.add(player);
+                        TaskFile taskFile = fileList.get(Integer.parseInt(data));
+                        PlayerClickTaskEvent clickTaskEvent = new PlayerClickTaskEvent(taskFile,player);
+                        Server.getInstance().getPluginManager().callEvent(clickTaskEvent);
+                        CreateMenu.runTaskFiles.remove(player);
+                    }
                     break;
                 case CreateMenu.TASKS:
                     if("null".equals(data)) {
@@ -125,6 +139,11 @@ public class ListenerMenu implements Listener{
         }else if(Integer.parseInt(data) == 1){
             CreateMenu.sendAgain(player);
         }else{
+            if(onRunning.contains(player)){
+                onRunning.remove(player);
+                CreateMenu.sendMenuRunningTaskList(player);
+                return;
+            }
             CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
         }
     }

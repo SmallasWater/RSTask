@@ -33,7 +33,7 @@ import java.util.*;
  */
 public class RsTask extends PluginBase{
 
-    private static final String CONFIG_VERSION = "1.5.2";
+    private static final String CONFIG_VERSION = "1.5.3";
     private static RsTask task;
 
     public static LinkedList<String> taskNames = new LinkedList<>();
@@ -140,6 +140,9 @@ public class RsTask extends PluginBase{
         if(canRunC()) {
             this.getServer().getCommandMap().register("c", new OpenTaskCommand("c"));
         }
+        if(canRunCList()) {
+            this.getServer().getCommandMap().register("c-list", new OpenTaskRunningCommand("c-list"));
+        }
         if(countChecking) {
             this.getServer().getCommandMap().register("c-rank", new RankCommand("c-rank"));
         }
@@ -153,6 +156,9 @@ public class RsTask extends PluginBase{
         return task;
     }
 
+    private boolean canRunCList(){
+        return getConfig().getBoolean("是否允许玩家执行c-list指令",true);
+    }
 
     /** 判断编号是否存在*/
     public boolean canExistsNumber(String number){
@@ -519,13 +525,10 @@ public class RsTask extends PluginBase{
                 }else{
                     this.getLogger().warning("配置文件删除失败 请手动删除");
                 }
-                File file1 = new File(this.getDataFolder()+"/language.properties");
-                if(!file1.delete()){
-                    this.getLogger().warning("language.properties 删除失败 请手动删除");
-                }
             }
 
         }
+
     }
 
     public int getGroupSize(){
