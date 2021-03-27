@@ -17,7 +17,7 @@ import java.util.LinkedList;
  * 线程池处理玩家任务
  *
  * @author SmallasWater*/
-public class CheckInventoryTask extends AsyncTask {
+public class CheckInventoryTask implements Runnable {
     private Player player;
     private LinkedList<PlayerTask> getTasks;
     private PlayerFile file;
@@ -34,10 +34,12 @@ public class CheckInventoryTask extends AsyncTask {
         this.newItem = newItem;
     }
 
-
+    public void setCancel(boolean cancel) {
+        this.cancel = cancel;
+    }
 
     @Override
-    public void onRun() {
+    public void run() {
         try {
             for (PlayerTask task : getTasks) {
                 if (task.getTaskFile().getType() == TaskFile.TaskType.CollectItem) {

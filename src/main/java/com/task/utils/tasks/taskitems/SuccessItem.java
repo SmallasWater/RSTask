@@ -128,7 +128,7 @@ public class SuccessItem {
         CommandClass[] commandClasses = new CommandClass[]{};
         for(Object tag:map.keySet()){
             if(tag instanceof String ){
-                if(tag.equals("Items")){
+                if("Items".equals(tag)){
                     Object o = map.get(tag);
                     if(o instanceof List){
                         itemClasses = new ItemClass[((List) o).size()];

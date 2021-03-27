@@ -103,6 +103,7 @@ public class API {
     public static void addItem(Player player, Item item, TaskFile.TaskType type){
         if(item != null){
             ItemClass itemClass = new ItemClass(item);
+
             if(!RsTask.getTask().canExisteItemClass(itemClass)){
                 ListerEvents.defaultUseTask(player.getName(),itemClass.toTaskItem(false), type,false);
             }else{

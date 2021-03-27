@@ -127,7 +127,7 @@ public class ListenerMenu implements Listener{
             if(RsTask.getTask().getClickTask.containsKey(player)){
                 TaskFile file1 = RsTask.getTask().getClickTask.get(player);
                 PlayerFile file2 = PlayerFile.getPlayerFile(player.getName());
-                Server.getInstance().getScheduler().scheduleDelayedTask(new CollectItemTask(RsTask.getTask(),player),1);
+                RsTask.executor.submit(new CollectItemTask(RsTask.getTask(),player));
                 if(file2.isSuccess(file1.getTaskName())){
                     PlayerFile.givePlayerSuccessItems(player,file1.getTaskName());
                 }else{

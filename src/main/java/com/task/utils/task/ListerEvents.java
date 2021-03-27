@@ -113,22 +113,15 @@ public class ListerEvents implements Listener{
 
             }
         }
+        RsTask.executor.execute(() -> API.addItem(player,item, TaskFile.TaskType.Click));
 
 
 
-    }
-
-
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onInt(PlayerInteractEvent event){
-        Player player = event.getPlayer();
-        if(event.isCancelled()) {
-            return;
-        }
-        Item item = event.getItem();
-        API.addItem(player,item, TaskFile.TaskType.Click);
 
     }
+
+
+
 
 
 
@@ -321,17 +314,24 @@ public class ListerEvents implements Listener{
     public void onInventoryChange(EntityInventoryChangeEvent event){
         Entity player = event.getEntity();
         if(player instanceof Player){
-            try{
-                PlayerFile file = PlayerFile.getPlayerFile(player.getName());
-                if(file != null) {
-                    LinkedList<PlayerTask> getTasks = file.getInviteTasks();
-                    if (getTasks == null || getTasks.size() == 0) {
-                        return;
-                    }
-                   Server.getInstance().getScheduler().scheduleAsyncTask(RsTask.getTask(),
-                            new CheckInventoryTask((Player) player, getTasks, file, event.getOldItem(), event.getNewItem(), event.isCancelled()));
+            RsTask.executor.execute(() -> {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            }catch(Exception ignored){ }
+                try{
+                    PlayerFile file = PlayerFile.getPlayerFile(player.getName());
+                    if(file != null) {
+                        LinkedList<PlayerTask> getTasks = file.getInviteTasks();
+                        if (getTasks == null || getTasks.size() == 0) {
+                            return;
+                        }
+                        new CheckInventoryTask((Player) player, getTasks, file, event.getOldItem(), event.getNewItem(), event.isCancelled()).run();
+                    }
+                }catch(Exception ignored){ }
+            });
+
 
         }
     }

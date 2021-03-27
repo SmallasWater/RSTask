@@ -6,7 +6,7 @@
 
     <groupId>com.smallaswater.rstask</groupId>
     <artifactId>RsTask</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.4</version>
     <dependencies>
         <dependency>
             <groupId>cn.nukkit</groupId>

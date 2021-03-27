@@ -10,7 +10,7 @@
 # 以下可以自定义按键名称与路径 按键数量为任务难度
 
 #配置文件版本 跟插件版本不挂钩
-version: "1.5.1"
+version: "1.5.3"
 
 #作用于任务分组
 自定义图片路径:
@@ -54,6 +54,7 @@ version: "1.5.1"
 是否开启积分验证: true
 
 
+
 #初始级别分数(建议为0)
 初始级别分数: 0
 
@@ -77,6 +78,10 @@ enable-Economy: true
 #关闭此选项后玩家将无法执行/c
 是否允许玩家执行c指令: true
 
+#关闭后玩家无法执行/c-list
+#功能 显示正在进行的任务
+是否允许玩家执行c-list指令: true
+
 #显示任务进度的底部类型 分为popup,tip,action
 底部显示类型: "tip"
 
@@ -85,13 +90,19 @@ enable-Economy: true
 # 但是这样会导致打开任务菜单卡顿
 主页面是否显示数量: true
 
-# 如可以放心了，自带书本检测
+# 可以放心了，自带书本检测
 领取任务是否给予任务书: false
 
 完成任务是否直接领取奖励: false
 
 # 支持 EconomyAPI Money ,PlayerPoint
 使用经济核心: EconomyAPI
+
+#单位： 分钟
+#玩家任务自动保存设置
+auto-save-task:
+ open: true
+ time: 5
 
 
 

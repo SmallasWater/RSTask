@@ -26,6 +26,8 @@ import updata.AutoData;
 import java.io.File;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 /**
@@ -74,6 +76,8 @@ public class RsTask extends PluginBase{
 
     private Config tagItem;
 
+    public static ExecutorService executor = Executors.newCachedThreadPool();
+
 
 
     private String[] defaultFirstName = new String[]{
@@ -101,10 +105,10 @@ public class RsTask extends PluginBase{
         if(countChecking) {
             this.getServer().getCommandMap().register("superTask", new RankCommand("c-rank"));
         }
-        this.getServer().getScheduler().scheduleRepeatingTask(new ChunkTaskTask(this),20);
-        this.getServer().getScheduler().scheduleRepeatingTask(new ChunkPlayerInventoryBookTask(this),20);
+        executor.execute(new ChunkTaskTask(this));
+        executor.execute(new ChunkPlayerInventoryBookTask(this));
         if(getConfig().getBoolean("auto-save-task.open")){
-            Server.getInstance().getScheduler().scheduleDelayedRepeatingTask(this,new AutoSaveFileTask(this),(20 * getConfig().getInt("auto-save-task.time")) * 60,(20 * getConfig().getInt("auto-save-task.time")) * 60);
+            executor.execute(new AutoSaveFileTask(this));
         }
 
     }

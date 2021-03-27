@@ -18,11 +18,16 @@ import java.util.LinkedList;
  * 玩家收集物品任务
  *
  * @author SmallasWater*/
-public class CollectItemTask extends PluginTask<RsTask> {
+public class CollectItemTask implements Runnable {
 
     private Player player;
+    private RsTask owner;
+
+    private RsTask getOwner() {
+        return owner;
+    }
     public CollectItemTask(RsTask plugin,Player player){
-        super(plugin);
+        this.owner = plugin;
         this.player = player;
     }
 
@@ -53,7 +58,7 @@ public class CollectItemTask extends PluginTask<RsTask> {
 
 
     @Override
-    public void onRun(int i) {
+    public void run() {
         onRun(player);
     }
 }

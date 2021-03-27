@@ -150,6 +150,7 @@ public class CreateMenu {
      * */
     public static void sendTaskList(Player player, int group){
         LinkedList<TaskFile> taskFiles = TaskFile.getDifficultyTasks(group);
+        runTaskFiles.remove(player);
         FormWindowSimple simple = makeSimpleByTasks(player,taskFiles,DataTool.getGroupName(group),RsTask.getTask().getLag("sendMenu-content"));
         send(player,simple, TASKS);
     }

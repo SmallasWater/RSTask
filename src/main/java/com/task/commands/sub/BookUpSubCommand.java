@@ -33,7 +33,7 @@ public class BookUpSubCommand extends BaseSubCommand {
         Item item = ((Player) sender).getInventory().getItemInHand();
         if(item instanceof ItemBookWritten){
             if(TaskBook.isBook((ItemBookWritten) item)){
-                Server.getInstance().getScheduler().scheduleDelayedTask(new CollectItemTask(RsTask.getTask(),(Player) sender),1);
+                RsTask.executor.submit(new CollectItemTask(RsTask.getTask(),(Player) sender));
                 PlayerOpenBookEvent event = new PlayerOpenBookEvent(
                         (Player) sender,TaskBook.getTaskBookByItem(((ItemBookWritten) item)));
                 Server.getInstance().getPluginManager().callEvent(event);
