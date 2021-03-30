@@ -9,6 +9,7 @@ import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.utils.Config;
 import cn.nukkit.utils.TextFormat;
 import com.task.commands.*;
+import com.task.items.ItemLib;
 import com.task.utils.task.AutoSaveFileTask;
 import com.task.utils.task.ChunkPlayerInventoryBookTask;
 import com.task.utils.task.ChunkTaskTask;
@@ -45,6 +46,8 @@ public class RsTask extends PluginBase{
     public LinkedHashMap<Player, TaskFile> getClickTask = new LinkedHashMap<>();
 
     public LinkedHashMap<String,TaskFile> tasks = new LinkedHashMap<>();
+
+
 
     public LinkedHashMap<String, PlayerFile> playerFiles = new LinkedHashMap<>();
 
@@ -87,6 +90,8 @@ public class RsTask extends PluginBase{
             "3","4","5","6","7","8","9","#"
     };
 
+
+
     @Override
     public void onEnable() {
         task = this;
@@ -100,6 +105,7 @@ public class RsTask extends PluginBase{
         this.getServer().getPluginManager().registerEvents(new ListenerMenu(),this);
         this.getServer().getPluginManager().registerEvents(new ListerEvents(),this);
 
+        loadItem();
         loadTask();
         registerCommand();
         if(countChecking) {
@@ -137,6 +143,13 @@ public class RsTask extends PluginBase{
         for(String playerName:getPlayerNames()){
             playerFiles.put(playerName, PlayerFile.getPlayerFile(playerName));
         }
+    }
+
+    public void loadItem(){
+        this.saveResource("ItemLib.yml",false);
+        ItemLib.ItemLibs = DataTool.loadItemLib(new Config(this.getDataFolder()+"/ItemLib.yml",Config.YAML));
+
+
     }
 
     private void registerCommand(){

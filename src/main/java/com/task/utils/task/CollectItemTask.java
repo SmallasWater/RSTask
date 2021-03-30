@@ -4,6 +4,7 @@ package com.task.utils.task;
 import cn.nukkit.Player;
 import cn.nukkit.scheduler.PluginTask;
 import com.task.RsTask;
+import com.task.items.ItemLib;
 import com.task.utils.DataTool;
 import com.task.utils.tasks.TaskFile;
 import com.task.utils.tasks.taskitems.ItemClass;
@@ -47,8 +48,13 @@ public class CollectItemTask implements Runnable {
             if(item != null){
                 ItemClass itemClass = ItemClass.toItem(item);
                 if(itemClass != null){
-                    item.setEndCount(DataTool.getCount(player,itemClass));
+                    if(itemClass  instanceof ItemLib){
+                        item.setEndCount(((ItemLib) itemClass).getPlayerAllItemCount(player));
+                    }else{
+                        item.setEndCount(DataTool.getCount(player,itemClass));
+                    }
                     file.setTaskValue(taskName,item);
+
                 }
 
             }

@@ -8,6 +8,7 @@ import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import com.task.RsTask;
+import com.task.items.ItemLib;
 import com.task.utils.ItemIDSunName;
 import com.task.utils.task.CollectItemTask;
 import com.task.utils.DayTime;
@@ -187,7 +188,14 @@ public class CreateMenu {
                 int playerItem = taskClass.getLoad(item);
                 int taskCount = item.getEndCount();
                 if(item.getTaskTag() != TaskItem.TaskItemTag.diyName){
-                    builder.add(ItemIDSunName.getIDByName(item.getItemClass().getItem())+"> "+playerItem+" / "+taskCount+"\n");
+                    if(item.getTaskTag() != TaskItem.TaskItemTag.lib) {
+                        builder.add(ItemIDSunName.getIDByName(item.getItemClass().getItem()) + "> " + playerItem + " / " + taskCount + "\n");
+                    }else{
+                        ItemLib lib = ItemLib.getItem(item.getTask().split("@")[0]);
+                        if(lib != null){
+                            builder.add(lib.getLibName() + "> " + playerItem + " / " + taskCount + "\n");
+                        }
+                    }
                 }else{
                     builder.add(item.getTask()+"> "+playerItem+" / "+taskCount+"\n");
                 }

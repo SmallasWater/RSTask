@@ -12,10 +12,12 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
+import cn.nukkit.utils.Config;
 import cn.nukkit.utils.DyeColor;
 import com.google.gson.reflect.TypeToken;
 import com.task.RsTask;
 import com.task.events.CreateTaskEvent;
+import com.task.items.ItemLib;
 import com.task.utils.tasks.TaskFile;
 import com.task.utils.tasks.taskitems.ItemClass;
 import com.google.gson.Gson;
@@ -211,6 +213,9 @@ public class DataTool {
      *
      * @return 物品数量*/
     public static int getCount(Player player, ItemClass item){
+        if(item instanceof ItemLib){
+            return ((ItemLib) item).getPlayerAllItemCount(player);
+        }
         int i = 0;
         for(Item playerItem:player.getInventory().getContents().values()){
             ItemClass itemClass = new ItemClass(playerItem);
@@ -284,6 +289,26 @@ public class DataTool {
     public static boolean existsGroup(int group){
         Map map = (Map) RsTask.getTask().getConfig().get("自定义图片路径");
         return map.containsKey(group + "");
+    }
+
+    public static ArrayList<ItemLib> loadItemLib(Config config){
+        ArrayList<ItemLib> itemLibs = new ArrayList<>();
+        ItemLib lib;
+        ArrayList<ItemClass> items;
+        for(Map.Entry<String, Object> objectEntry : config.getAll().entrySet()){
+            if(objectEntry.getValue() instanceof List){
+                items = new ArrayList<>();
+                for(Object msg: (List)objectEntry.getValue()){
+                    ItemClass customItem = ItemClass.toItem(msg.toString());
+                    if(customItem != null){
+                        items.add(customItem);
+                    }
+                }
+                lib = new ItemLib(objectEntry.getKey(),items);
+                itemLibs.add(lib);
+            }
+        }
+        return itemLibs;
     }
 
 

@@ -4,10 +4,12 @@ package com.task.utils.tasks;
 import cn.nukkit.Player;
 import cn.nukkit.Server;
 import cn.nukkit.command.ConsoleCommandSender;
+import cn.nukkit.item.Item;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.Sound;
 import cn.nukkit.utils.Config;
 import com.task.RsTask;
+import com.task.items.ItemLib;
 import com.task.utils.ItemIDSunName;
 import com.task.utils.tasks.taskitems.*;
 import com.task.utils.DataTool;
@@ -763,13 +765,25 @@ public class PlayerFile {
                 TaskItem[] items1 = file.getTaskItem();
                 for(TaskItem item:items1){
                     ItemClass itemClass = ItemClass.toItem(item);
+
                     if(itemClass != null){
-                        itemClass.getItem().setCount(item.getEndCount());
-                        if(DataTool.getCount(player,itemClass) >= itemClass.getItem().getCount()){
-                            player.getInventory().removeItem(itemClass.getItem());
-                        }else{
-                            player.sendMessage(RsTask.getTask().getLag("error-task","§d§l[任务系统]§c出现异常!!!"));
-                            return;
+                        if(itemClass instanceof ItemLib){
+                            ((ItemLib) itemClass).setCount(item.getEndCount());
+                            if(((ItemLib) itemClass).hasReduceItem(player)){
+                                ((ItemLib) itemClass).reduceItem(player);
+                            }else{
+                                player.sendMessage(RsTask.getTask().getLag("error-task","§d§l[任务系统]§c出现异常!!!"));
+                                return;
+                            }
+
+                        }else {
+                            itemClass.getItem().setCount(item.getEndCount());
+                            if (DataTool.getCount(player, itemClass) >= itemClass.getItem().getCount()) {
+                                player.getInventory().removeItem(itemClass.getItem());
+                            } else {
+                                player.sendMessage(RsTask.getTask().getLag("error-task", "§d§l[任务系统]§c出现异常!!!"));
+                                return;
+                            }
                         }
                     }
                 }
@@ -784,7 +798,14 @@ public class PlayerFile {
             if(item.getItem() != null && item.getItem().length > 0){
                 for(ItemClass itemClass:item.getItem()){
                     if(itemClass != null){
-                        player.getInventory().addItem(itemClass.getItem().clone());
+                        if(itemClass instanceof ItemLib){
+                            Item i = (((ItemLib) itemClass).getItemClass()).getItem().clone();
+                            i.setCount(((ItemLib) itemClass).getCount());
+                            player.getInventory().addItem(i);
+                        }else{
+                            player.getInventory().addItem(itemClass.getItem().clone());
+                        }
+
                         player.sendMessage(RsTask.getTask().getLag("add-item-message")
                                 .replace("%s", ItemIDSunName.getIDByName(itemClass.getItem())).replace("%c",itemClass.getItem().getCount()+""));
                     }

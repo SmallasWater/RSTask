@@ -3,6 +3,7 @@ package com.task.utils.task;
 import cn.nukkit.Player;
 import cn.nukkit.item.Item;
 import cn.nukkit.scheduler.AsyncTask;
+import com.task.items.ItemLib;
 import com.task.utils.API;
 import com.task.utils.tasks.PlayerFile;
 import com.task.utils.tasks.TaskFile;
@@ -47,8 +48,18 @@ public class CheckInventoryTask implements Runnable {
                         TaskItem[] items = task.getTaskClass().getValue();
                         for (TaskItem item : items) {
                             ItemClass itemClass = ItemClass.toItem(item);
+
                             if (itemClass != null) {
-                                if (oldItem.equals(itemClass.getItem()) || newItem.equals(itemClass.getItem())) {
+                                if(itemClass instanceof ItemLib){
+                                    if(((ItemLib) itemClass).hasItem(oldItem) || ((ItemLib) itemClass).hasItem(newItem)){
+
+                                        int c = ((ItemLib) itemClass).getPlayerAllItemCount(player);
+                                        if (c != item.getEndCount()) {
+                                            file.setTaskValue(task.getTaskName(), item.getTask(), c);
+                                        }
+                                    }
+
+                                }else if (oldItem.equals(itemClass.getItem()) || newItem.equals(itemClass.getItem())) {
                                     int c = DataTool.getCount(player, itemClass);
                                     if (c < 0) {
                                         c = 0;

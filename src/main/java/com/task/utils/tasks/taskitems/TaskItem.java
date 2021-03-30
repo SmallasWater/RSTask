@@ -58,6 +58,8 @@ public class TaskItem {
                     return TaskItemTag.NbtItem;
                 case "item":
                     return TaskItemTag.defaultItem;
+                case "lib":
+                    return TaskItemTag.lib;
                     default:
                         break;
             }
@@ -89,6 +91,8 @@ public class TaskItem {
         NbtItem,
         /**普通物品*/
         defaultItem,
+        /**物品字典*/
+        lib,
         /**自定义名称*/
         diyName
     }
@@ -123,15 +127,16 @@ public class TaskItem {
             return null;
         }
         if(defaultString.split("@").length > 1){
+            String sItem = defaultString.split("@")[0];
+            String[] lists = sItem.split(":");
             switch (defaultString.split("@")[1]){
                 case "item":
-                    String sItem = defaultString.split("@")[0];
-                    String[] lists = sItem.split(":");
                     return new TaskItem(taskName,lists[0]+":"+lists[1]+"@item",Integer.parseInt(lists[2]));
                 case "tag":
-                    sItem = defaultString.split("@")[0];
-                    lists = sItem.split(":");
+
                     return new TaskItem(taskName,lists[0]+"@tag",Integer.parseInt(lists[1]));
+                case "lib":
+                    return new TaskItem(taskName,lists[0]+"@lib",Integer.parseInt(lists[1]));
                     default:
                         break;
             }

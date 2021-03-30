@@ -4,18 +4,23 @@ package com.task.utils.tasks.taskitems;
 import cn.nukkit.item.Item;
 import cn.nukkit.nbt.tag.CompoundTag;
 import com.task.RsTask;
+import com.task.items.InstanceItem;
+import com.task.items.ItemLib;
 
 
 /**
  * @author SmallasWater
  */
-public class ItemClass {
+public class ItemClass implements InstanceItem {
+
 
     private Item item;
 
     public ItemClass(Item item){
         this.item = item;
     }
+
+    public ItemClass(){}
 
 
     ItemClass(int id, int mate, int count){
@@ -24,7 +29,7 @@ public class ItemClass {
 
 
 
-    public ItemClass(int id,int mate,int count,String tag){
+    public ItemClass(int id, int mate, int count, String tag){
         Item item = Item.get(id,mate,count);
         if(!"not".equals(tag)){
             CompoundTag compoundTag = Item.parseCompoundTag(hexStringToBytes(tag));
@@ -110,10 +115,35 @@ public class ItemClass {
                     }else{
                         return RsTask.getTask().getTagItemsConfig(ts);
                     }
+                }else if("lib".equals(defaultString.split("@")[1])){
+                    String ts = defaultString.split("@")[0];
+                    String name;
+                    int count = 1;
+                    if(ts.split(":").length > 1){
+                        name = ts.split(":")[0];
+                        try {
+                            count = Integer.parseInt(ts.split(":")[1]);
+                        }catch (Exception ignore){}
+                        ItemLib lib = ItemLib.getItem(name);
+                        if(lib != null){
+                            lib.setCount(count);
+                            return lib;
+                        }
+
+                    }
                 }
             }
         }else{
+
             String[] items = defaultString.split(":");
+            if(items.length < 3){
+                return new ItemClass(Integer.parseInt(items[0]),
+                        Integer.parseInt(items[1]), 1);
+            }else if(items.length == 3){
+                return new ItemClass(Integer.parseInt(items[0]),
+                        Integer.parseInt(items[1]),  Integer.parseInt(items[2]));
+            }
+
             try {
                 return new ItemClass(Integer.parseInt(items[0]),
                         Integer.parseInt(items[1]), Integer.parseInt(items[2]),items[3]);
@@ -148,6 +178,15 @@ public class ItemClass {
                 return new ItemClass(item1);
             }
             return itemClass;
+        }else if(item.getTaskTag() == TaskItem.TaskItemTag.lib){
+            String custom = item.getTask().split("@")[0];
+            ItemLib lib = ItemLib.getItem(custom);
+            if(lib == null){
+                Item item1 = new Item(0,1);
+                item1.setCustomName("无数据");
+                return new ItemClass(item1);
+            }
+            return lib;
         }
         return null;
     }
@@ -179,6 +218,9 @@ public class ItemClass {
     }
 
 
+    /**
+     * 获取名称
+     * */
     public String toSaveConfig(boolean defaultType){
         if(item.hasCompoundTag() && defaultType){
             String i = RsTask.getTask().saveTagItemsConfig(this);
