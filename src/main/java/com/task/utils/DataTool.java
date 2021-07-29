@@ -312,6 +312,17 @@ public class DataTool {
     }
 
 
+    public static void sortTaskFiles(LinkedList<TaskFile> files){
+        files.sort((p1, p2) -> {
+            //按照Person的年龄进行升序排列
+            if (p1.getName().compareTo(p2.getName()) == 0) {
+                return 1;
+            }
+            return p1.getName().compareTo(p2.getName());
+        });
+
+    }
+
 
 
 }

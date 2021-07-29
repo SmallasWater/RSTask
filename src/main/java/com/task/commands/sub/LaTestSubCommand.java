@@ -49,6 +49,7 @@ public class LaTestSubCommand extends BaseSubCommand {
                             if(playerFile.isRunning(file1.getTaskName())){
                                 if(date == null){
                                     date = playerFile.getTaskByName(file1.getTaskName()).getTaskClass().getTime();
+                                    file = file1;
                                 }else{
                                     if(playerFile.getTaskByName(file1.getTaskName()).getTaskClass().getTime().getTime() > date.getTime()){
                                         file = file1;

@@ -36,6 +36,8 @@ public class CreateMenu {
 
     public static RsTask task = RsTask.getTask();
 
+    public static LinkedHashMap<Player,LinkedHashMap<Integer,Integer>> clickGroup = new LinkedHashMap<>();
+
     public static LinkedHashMap<Player,LinkedList<TaskFile>> runTaskFiles = new LinkedHashMap<>();
 
 
@@ -44,6 +46,7 @@ public class CreateMenu {
      * @param player 玩家
      * */
     public static void sendMenu(Player player){
+        LinkedHashMap<Integer,Integer> c = new LinkedHashMap<>();
         PlayerFile playerFiles = PlayerFile.getPlayerFile(player.getName());
         FormWindowSimple simple =
                 new FormWindowSimple
@@ -51,8 +54,10 @@ public class CreateMenu {
                                 (task.getLag("player-task-integral").replace("%c",playerFiles.getCount()+"").replace("%f", RsTask.getTask().getFName()))
                                 : "");
         int i = 0;
+        int b = 0;
         Map map = ((Map)task.getConfig().get("自定义图片路径"));
         for (Object o:map.keySet()){
+
             Map map1 = (Map) map.get(o);
             String s = " ";
             if(RsTask.canOpen()){
@@ -72,13 +77,24 @@ public class CreateMenu {
                     s = (RsTask.getTask().getLag("Lock").replace("%c", DataTool.starNeed(i)+"").replace("%f", RsTask.getTask().getFName()));
                 }
             }
-            ElementButton button = new ElementButton(map1.get("名称")+s);
-            ElementButtonImageData imageData = new ElementButtonImageData(map1.get("图片类型").toString().equals("网络")?"url":"path",(String) map1.get("图片路径"));
-            button.addImage(imageData);
-            simple.addButton(button);
+            boolean isShow = true;
+            if(map1.containsKey("是否显示")){
+                isShow = Boolean.valueOf(map1.get("是否显示").toString());
+            }
+            if(isShow){
+                ElementButton button = new ElementButton(map1.get("名称")+s);
+                ElementButtonImageData imageData = new ElementButtonImageData("网络".equals(map1.get("图片类型").toString())?"url":"path",(String) map1.get("图片路径"));
+                button.addImage(imageData);
+                simple.addButton(button);
+                c.put(b,i);
+                b++;
+            }else{
+                c.put(b,i);
+            }
+            i++ ;
 
-            i ++ ;
         }
+        clickGroup.put(player,c);
         send(player,simple, MENU);
     }
 

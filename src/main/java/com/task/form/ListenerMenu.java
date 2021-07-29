@@ -44,7 +44,6 @@ public class ListenerMenu implements Listener{
             int fromId = ui.formId;
             switch (fromId){
                 case CreateMenu.MENU:
-                    // 测试难度1
                     if("null".equals(data)) {
                         return;
                     }
@@ -56,7 +55,8 @@ public class ListenerMenu implements Listener{
                             return;
                         }
                     }
-                    RsTask.getClickStar.put(player,Integer.parseInt(data));
+                    int c = CreateMenu.clickGroup.get(player).get(Integer.parseInt(data));
+                    RsTask.getClickStar.put(player,c);
                     CreateMenu.sendTaskList(player, RsTask.getClickStar.get(player));
                     break;
                 case CreateMenu.INVITE:

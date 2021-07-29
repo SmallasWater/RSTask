@@ -113,7 +113,7 @@ public class TaskFile {
 
         Click("点击"),
 
-        Kill("击杀玩家"),
+
 
         DIY("自定义");
         protected String taskType;
@@ -546,6 +546,7 @@ public class TaskFile {
                 files.add(file);
             }
         }
+        DataTool.sortTaskFiles(files);
         return files;
     }
 

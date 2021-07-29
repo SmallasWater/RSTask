@@ -111,7 +111,7 @@ public class TaskBook {
             for(StringBuilder s:item.toList()){
                 three.append("§r").append(s.toString()).append("\n");
             }
-            three.append("\n\n\n§c(如果内容不符请重新打开或执行/cbook up)");
+            three.append(RsTask.getTask().getConfig().getString("书本注释","\n\n\n§c(如果内容不符请重新打开或执行/cbook up)"));
             writeIn((CreateMenu.getTitles(player, file) + "§r\n").replace("§e","§r")).writeIn(two.toString().replace("§e","§r")).writeIn(three.toString().replace("§e","§r"));
         }
     }

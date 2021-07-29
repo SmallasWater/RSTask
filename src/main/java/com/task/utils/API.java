@@ -14,7 +14,6 @@ import com.task.utils.task.ListerEvents;
 
 import java.util.LinkedList;
 
-import static com.task.utils.task.ListerEvents.defaultUseTask;
 
 /**
  * @author SmallasWater
@@ -103,7 +102,6 @@ public class API {
     public static void addItem(Player player, Item item, TaskFile.TaskType type){
         if(item != null){
             ItemClass itemClass = new ItemClass(item);
-
             if(!RsTask.getTask().canExisteItemClass(itemClass)){
                 ListerEvents.defaultUseTask(player.getName(),itemClass.toTaskItem(false), type,false);
             }else{
@@ -156,7 +154,7 @@ public class API {
      * @param player 玩家
      * @return 进行中的任务
      * */
-    public LinkedList<PlayerTask> getAllRunTasks(Player player){
+    public static LinkedList<PlayerTask> getAllRunTasks(Player player){
         //获取玩家全部进行的任务
         LinkedList<PlayerTask> tasks = new LinkedList<>();
         PlayerFile file = PlayerFile.getPlayerFile(player.getName());

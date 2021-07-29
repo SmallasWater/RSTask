@@ -43,7 +43,7 @@ public class CheckInventoryTask implements Runnable {
     public void run() {
         try {
             for (PlayerTask task : getTasks) {
-                if (task.getTaskFile().getType() == TaskFile.TaskType.CollectItem) {
+                if (task.getTaskFile().getType() == TaskFile.TaskType.CollectItem || task.getTaskFile().getType() == TaskFile.TaskType.DIY) {
                     if (isNext(task)) {
                         TaskItem[] items = task.getTaskClass().getValue();
                         for (TaskItem item : items) {

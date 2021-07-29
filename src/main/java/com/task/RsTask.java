@@ -96,6 +96,7 @@ public class RsTask extends PluginBase{
     public void onEnable() {
         task = this;
         this.getLogger().info("[RSTask] 启动任务系统插件");
+
         if(Server.getInstance().getPluginManager().getPlugin("AutoUpData") != null){
             if(AutoData.defaultUpData(this,getFile(),"SmallasWater","RSTask")){
                 return;
@@ -116,6 +117,10 @@ public class RsTask extends PluginBase{
         if(getConfig().getBoolean("auto-save-task.open")){
             executor.execute(new AutoSaveFileTask(this));
         }
+        Server.getInstance().getScheduler().scheduleDelayedTask(this, () -> {
+            RsTask.getTask().getLogger().info("本插件为免费开源插件");
+            RsTask.getTask().getLogger().info("GitHub: https://github.com/SmallasWater/RSTask");
+        },20);
 
     }
 

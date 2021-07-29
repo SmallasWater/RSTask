@@ -3,7 +3,9 @@ package com.task.commands;
 
 import cn.nukkit.command.CommandSender;
 import com.task.commands.base.BaseCommand;
+import com.task.commands.sub.AddAllTaskValueSubCommand;
 import com.task.commands.sub.AddTaskValueSubCommand;
+import com.task.commands.sub.SetAllTaskValueSubCommand;
 import com.task.commands.sub.SetTaskValueSubCommand;
 
 
@@ -18,6 +20,8 @@ public class RunTaskCommand extends BaseCommand {
         this.usageMessage = "/rtc help";
         this.addSubCommand(new AddTaskValueSubCommand("add"));
         this.addSubCommand(new SetTaskValueSubCommand("set"));
+        this.addSubCommand(new AddAllTaskValueSubCommand("addall"));
+        this.addSubCommand(new SetAllTaskValueSubCommand("setall"));
         loadCommandBase();
     }
 
@@ -32,9 +36,9 @@ public class RunTaskCommand extends BaseCommand {
     @Override
     public void sendHelp(CommandSender sender) {
         sender.sendMessage("/rtc add <玩家> <任务名> <进度> <数量> <提示(false) 可不填>");
-        sender.sendMessage("/rtc addAll <玩家> <任务名> <进度> <数量> <提示(false) 可不填>");
+        sender.sendMessage("/rtc addall <玩家> <进度> <数量> <提示(false) 可不填>");
         sender.sendMessage("/rtc set <玩家> <进度> <数量> <提示(false) 可不填>");
-        sender.sendMessage("/rtc setAll <玩家> <进度> <数量> <提示(false) 可不填>");
+        sender.sendMessage("/rtc setall <玩家> <进度> <数量> <提示(false) 可不填>");
         sender.sendMessage("ps: 收集类型物品无法增加进度");
     }
 }

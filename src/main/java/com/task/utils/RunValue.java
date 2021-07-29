@@ -26,9 +26,22 @@ public class RunValue {
     }
 
     public static RunValue getInstance(String[] args){
-        String taskName = args[2];
-        String load = args[3];
-        String value = args[4];
+        return getInstance(args,true);
+    }
+    public static RunValue getInstance(String[] args,boolean hasTaskName){
+        String taskName = null;
+        String load;
+        String value;
+        if(!hasTaskName){
+            load = args[2];
+            value = args[3];
+        }else{
+            taskName = args[2];
+            load = args[3];
+            value = args[4];
+
+        }
+
         int v;
         try {
             v = Integer.parseInt(value);
