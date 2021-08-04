@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
  */
 public class RsTask extends PluginBase{
 
-    private static final String CONFIG_VERSION = "1.5.3";
+    private static final String CONFIG_VERSION = "1.5.4";
     private static RsTask task;
 
     public static LinkedList<String> taskNames = new LinkedList<>();
@@ -495,6 +495,8 @@ public class RsTask extends PluginBase{
             playerConfig.put(playerName, new Config(getDataFolder() + getPlayerFileName(playerName)));
 
         }
+        saveDefaultConfig();
+        reloadConfig();
         chunkConfigVersion();
         if(!new File(this.getDataFolder()+"/language.properties").exists()){
             this.saveResource("language.properties",false);

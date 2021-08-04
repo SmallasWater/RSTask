@@ -815,7 +815,11 @@ public class PlayerFile {
             if(item.getCmd() != null && item.getCmd().length > 0){
                 for(CommandClass commandClass:item.getCmd()){
                     if(commandClass != null){
-                        Server.getInstance().getCommandMap().dispatch(new ConsoleCommandSender(),commandClass.getCmd().replace("%p",player.getName()));
+                        String playerName = player.getName();
+                        if(playerName.contains(" ")){
+                            playerName = playerName.substring(0,playerName.indexOf(" "));
+                        }
+                        Server.getInstance().getCommandMap().dispatch(new ConsoleCommandSender(),commandClass.getCmd().replace("%p",playerName));
                         player.sendMessage(RsTask.getTask().getLag("add-Cmd-message").replace("%s",commandClass.getSendMessage()));
                     }
                 }
