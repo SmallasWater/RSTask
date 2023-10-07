@@ -9,18 +9,21 @@ import cn.nukkit.form.window.FormWindowModal;
 import cn.nukkit.form.window.FormWindowSimple;
 import com.task.RsTask;
 import com.task.items.ItemLib;
+import com.task.utils.DataTool;
+import com.task.utils.DayTime;
 import com.task.utils.ItemIDSunName;
 import com.task.utils.task.CollectItemTask;
-import com.task.utils.DayTime;
+import com.task.utils.tasks.PlayerFile;
 import com.task.utils.tasks.TaskFile;
 import com.task.utils.tasks.taskitems.PlayerTask;
 import com.task.utils.tasks.taskitems.PlayerTaskClass;
 import com.task.utils.tasks.taskitems.SuccessItem;
 import com.task.utils.tasks.taskitems.TaskItem;
-import com.task.utils.DataTool;
-import com.task.utils.tasks.PlayerFile;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * @author SmallasWater
@@ -279,7 +282,6 @@ public class CreateMenu {
      * @param file 任务文件
      * */
     public static void sendTaskMenu(Player player, TaskFile file){
-
         FormWindowSimple simple = new FormWindowSimple(task.getLag("title"),"");
         StringBuilder builder = new StringBuilder();
         builder.append(getTitles(player,file));
@@ -347,13 +349,13 @@ public class CreateMenu {
      * */
     public static void sendCreateTaskMenu(Player player){
         FormWindowCustom custom = new FormWindowCustom("创建任务");
-        custom.addElement(new ElementLabel("任务创建UI 请根据提示填写(此UI仅提供简易的任务创建，若进一步更改请修改配置)"));
-        custom.addElement(new ElementInput("请输入任务名称","例如: 任务①--破坏收集橡木","任务①--破坏收集橡木"));
+        custom.addElement(new ElementLabel("任务创建UI 请根据提示填写(此UI仅提供简易的任务创建，若进一步更改请修改配置)")); //0
+        custom.addElement(new ElementInput("请输入任务名称","例如: 任务①--破坏收集橡木","任务①--破坏收集橡木")); //1
         LinkedList<String> list = new LinkedList<>();
         for(TaskFile.TaskType type: TaskFile.TaskType.values()){
             list.add(type.getTaskType());
         }
-        custom.addElement(new ElementDropdown("请选择任务类型",list,3));
+        custom.addElement(new ElementDropdown("请选择任务类型",list,3)); //2
         LinkedList<String> list1 = new LinkedList<>();
         Map map = ((Map)task.getConfig().get("自定义图片路径"));
         Map map1;
@@ -361,11 +363,11 @@ public class CreateMenu {
              map1 = (Map) map.get(i+"");
              list1.add(map1.get("名称").toString());
         }
-        custom.addElement(new ElementDropdown("请选择任务分组",list1));
-        custom.addElement(new ElementInput("请输入任务难度(整数)","例如: 1","1"));
-        custom.addElement(new ElementInput("请输入任务介绍","例如: 收集10个橡木","收集10个橡木"));
-        custom.addElement(new ElementInput("请输入任务完成条件(&区分多个元素) @item为物品(17:0:10@item) @lib 为物品词典(木块:10@lib) @tag为nbt物品(id:10@tag) (自定义任务请输 内容:数量)","例如: 17:0:10@item 或 id:10@tag(收集任务)","17:0:10@item"));
-        custom.addElement(new ElementInput("请输入任务奖励(&区分多个元素)@item 为奖励物品 @tag奖励TagItem.json里的物品 @lib 为奖励物品词典内物品(仅第一个)@money奖励金钱 @Cmd奖励指令(%p代表玩家)","例如: 366:0:1@item 或 id:1@tag","366:0:1@item&100@money"));
+        custom.addElement(new ElementDropdown("请选择任务分组",list1)); //3
+        custom.addElement(new ElementInput("请输入任务难度(整数)","例如: 1","1")); //4
+        custom.addElement(new ElementInput("请输入任务介绍","例如: 收集10个橡木","收集10个橡木")); //5
+        custom.addElement(new ElementInput("请输入任务完成条件(&区分多个元素) @item为物品(17:0:10@item) @lib 为物品词典(木块:10@lib) @tag为nbt物品(id:10@tag) (自定义任务请输 内容:数量)","例如: 17:0:10@item 或 id:10@tag(收集任务)","17:0:10@item")); //6
+        custom.addElement(new ElementInput("请输入任务奖励(&区分多个元素)@item 为奖励物品 @tag奖励TagItem.json里的物品 @lib 为奖励物品词典内物品(仅第一个)@money奖励金钱 @Cmd奖励指令(%p代表玩家)","例如: 366:0:1@item 或 id:1@tag","366:0:1@item&100@money")); //7
         send(player,custom, CREATE);
     }
 
