@@ -20,6 +20,7 @@ public class AutoSaveFileTask implements Runnable {
     private RsTask getOwner() {
         return owner;
     }
+
     public AutoSaveFileTask(RsTask owner) {
         this.owner = owner;
     }

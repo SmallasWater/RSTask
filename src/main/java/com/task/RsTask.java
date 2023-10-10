@@ -145,9 +145,9 @@ public class RsTask extends PluginBase{
         canSuccess = getConfig().getBoolean("完成任务是否直接领取奖励",true);
 
         playerFiles = new LinkedHashMap<>();
-        for(String playerName:getPlayerNames()){
-            playerFiles.put(playerName, PlayerFile.getPlayerFile(playerName));
-        }
+//        for(String playerName:getPlayerNames()){
+//            playerFiles.put(playerName, PlayerFile.getPlayerFile(playerName));
+//        }
     }
 
     public void loadItem(){
